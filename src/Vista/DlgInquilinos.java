@@ -61,9 +61,19 @@ public class DlgInquilinos extends javax.swing.JDialog {
 
         btnBuscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Buscar.png"))); // NOI18N
         btnBuscar.setText("Buscar");
+        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarActionPerformed(evt);
+            }
+        });
 
         btnMostrarTodo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/MostrarTodo.png"))); // NOI18N
         btnMostrarTodo.setText("Mostrar todo");
+        btnMostrarTodo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMostrarTodoActionPerformed(evt);
+            }
+        });
 
         tblInquilinos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -230,6 +240,14 @@ public class DlgInquilinos extends javax.swing.JDialog {
     private void txtInquilinosRegistradosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtInquilinosRegistradosActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtInquilinosRegistradosActionPerformed
+
+    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void btnMostrarTodoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarTodoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnMostrarTodoActionPerformed
 
     /**
      * @param args the command line arguments

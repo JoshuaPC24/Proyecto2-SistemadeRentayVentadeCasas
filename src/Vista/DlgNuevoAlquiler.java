@@ -61,11 +61,11 @@ public class DlgNuevoAlquiler extends javax.swing.JDialog {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        jLabel9.setText("Registro del Nuevo Alquiler");
         jLabel9.setFont(new java.awt.Font("Segoe UI Black", 1, 18)); // NOI18N
+        jLabel9.setText("Registro del Nuevo Alquiler");
 
-        jLabel10.setText("Complete la Información del Alquiler");
         jLabel10.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
+        jLabel10.setText("Complete la Información del Alquiler");
 
         jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Alquiler(2).png"))); // NOI18N
 
@@ -95,48 +95,58 @@ public class DlgNuevoAlquiler extends javax.swing.JDialog {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos del Alquiler", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
 
-        jLabel1.setText("Número del Alquiler:");
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel1.setText("Número del Alquiler:");
 
         txtnumAlquiler.setEditable(false);
 
-        jLabel2.setText("Fecha del Contrato:");
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel2.setText("Fecha del Contrato:");
 
-        jLabel3.setText("Cantidad de Meses:");
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel3.setText("Cantidad de Meses:");
 
-        jLabel4.setText("Metros de niños:");
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel4.setText("Metros de niños:");
 
-        jLabel5.setText("Deposito de Garantia:");
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel5.setText("Deposito de Garantia:");
 
-        jLabel6.setText("Porcentaje de Incremento Anual:");
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel6.setText("Porcentaje de Incremento Anual:");
 
         btnGuardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Guardar.png"))); // NOI18N
         btnGuardar.setText("Guardar");
+        btnGuardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuardarActionPerformed(evt);
+            }
+        });
 
         btnCancelar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Cerrar(2).png"))); // NOI18N
         btnCancelar.setText("Cancelar");
+        btnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelarActionPerformed(evt);
+            }
+        });
 
-        jLabel7.setText("Cantidad de Adultos:");
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel7.setText("Cantidad de Adultos:");
 
-        jLabel8.setText("Inquilino:");
         jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel8.setText("Inquilino:");
 
-        jLabel12.setText("Precio de Alquiler Mensual:");
         jLabel12.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel12.setText("Precio de Alquiler Mensual:");
 
-        jLabel13.setText("Vivienda:");
         jLabel13.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel13.setText("Vivienda:");
 
         cmbInquilino.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione Inquilino..." }));
 
-        jLabel14.setText("Estado:");
         jLabel14.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel14.setText("Estado:");
 
         cmbEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione el Estado..." }));
 
@@ -272,6 +282,14 @@ public class DlgNuevoAlquiler extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCancelarActionPerformed
 
     /**
      * @param args the command line arguments

@@ -123,6 +123,11 @@ public class DlgMostrarMensualidades extends javax.swing.JDialog {
         lblMontoPagar.setText("Total monto a pagar");
 
         btnCerrar.setText("Cerrar");
+        btnCerrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCerrarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout lblCantidadRegistrosLayout = new javax.swing.GroupLayout(lblCantidadRegistros);
         lblCantidadRegistros.setLayout(lblCantidadRegistrosLayout);
@@ -216,6 +221,10 @@ public class DlgMostrarMensualidades extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCerrarActionPerformed
 
     /**
      * @param args the command line arguments

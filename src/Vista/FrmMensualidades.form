@@ -240,6 +240,9 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Generar"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnGenerarActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -342,6 +345,9 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Mostrar Mensualidad"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMostrarMensualidadesActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -386,7 +392,7 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="txtTotalRegistros" min="-2" pref="113" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
-                          <Component id="jButton1" min="-2" pref="125" max="-2" attributes="0"/>
+                          <Component id="btnCancelarMensu" min="-2" pref="125" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -412,7 +418,7 @@
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" attributes="0">
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jButton1" alignment="3" min="-2" pref="44" max="-2" attributes="0"/>
+                          <Component id="btnCancelarMensu" alignment="3" min="-2" pref="44" max="-2" attributes="0"/>
                           <Component id="jLabel13" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="txtTotalRegistros" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -493,6 +499,9 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Filtrar"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnFiltrarActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnLimpiar">
           <Properties>
@@ -501,6 +510,9 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Limpiar"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnLimpiarActionPerformed"/>
+          </Events>
         </Component>
         <Container class="javax.swing.JScrollPane" name="jScrollPane1">
           <AuxValues>
@@ -538,13 +550,16 @@
             <Property name="editable" type="boolean" value="false"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JButton" name="jButton1">
+        <Component class="javax.swing.JButton" name="btnCancelarMensu">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/imagenes/cerrar.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Cerrar"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCancelarMensuActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

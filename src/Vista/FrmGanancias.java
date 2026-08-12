@@ -134,6 +134,11 @@ public class FrmGanancias extends javax.swing.JFrame {
         cboMes.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" }));
 
         btnCalcularGanancias.setText("Calcular Ganancias");
+        btnCalcularGanancias.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCalcularGananciasActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -289,6 +294,10 @@ public class FrmGanancias extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnCalcularGananciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCalcularGananciasActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCalcularGananciasActionPerformed
 
     /**
      * @param args the command line arguments

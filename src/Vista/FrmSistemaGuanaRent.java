@@ -122,6 +122,11 @@ public class FrmSistemaGuanaRent extends javax.swing.JFrame {
 
         btnGanancias.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Ganancias.png"))); // NOI18N
         btnGanancias.setText("Ganancias");
+        btnGanancias.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGananciasActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlMenuLayout = new javax.swing.GroupLayout(pnlMenu);
         pnlMenu.setLayout(pnlMenuLayout);
@@ -262,6 +267,10 @@ public class FrmSistemaGuanaRent extends javax.swing.JFrame {
         ventana.setLocationRelativeTo(this);
         ventana.setVisible(true);
     }//GEN-LAST:event_btnMensualidadesActionPerformed
+
+    private void btnGananciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGananciasActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnGananciasActionPerformed
 
     /**
      * @param args the command line arguments

@@ -255,6 +255,9 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Ganancias"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnGananciasActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

@@ -58,7 +58,7 @@ public class FrmMensualidades extends javax.swing.JFrame {
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
         txtTotalRegistros = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        btnCancelarMensu = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -114,6 +114,11 @@ public class FrmMensualidades extends javax.swing.JFrame {
 
         btnGenerar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Generar.png"))); // NOI18N
         btnGenerar.setText("Generar");
+        btnGenerar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGenerarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -166,6 +171,11 @@ public class FrmMensualidades extends javax.swing.JFrame {
 
         btnMostrarMensualidades.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/MostrarMensualidades.png"))); // NOI18N
         btnMostrarMensualidades.setText("Mostrar Mensualidad");
+        btnMostrarMensualidades.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMostrarMensualidadesActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -216,9 +226,19 @@ public class FrmMensualidades extends javax.swing.JFrame {
 
         btnFiltrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Filtrar.png"))); // NOI18N
         btnFiltrar.setText("Filtrar");
+        btnFiltrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFiltrarActionPerformed(evt);
+            }
+        });
 
         btnLimpiar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Limpiar.png"))); // NOI18N
         btnLimpiar.setText("Limpiar");
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
 
         tblMensualidades.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -237,8 +257,13 @@ public class FrmMensualidades extends javax.swing.JFrame {
 
         txtTotalRegistros.setEditable(false);
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/cerrar.png"))); // NOI18N
-        jButton1.setText("Cerrar");
+        btnCancelarMensu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/cerrar.png"))); // NOI18N
+        btnCancelarMensu.setText("Cerrar");
+        btnCancelarMensu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelarMensuActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -272,7 +297,7 @@ public class FrmMensualidades extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtTotalRegistros, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnCancelarMensu, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())))
         );
         jPanel4Layout.setVerticalGroup(
@@ -293,7 +318,7 @@ public class FrmMensualidades extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnCancelarMensu, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel13)
                         .addComponent(txtTotalRegistros, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -333,6 +358,26 @@ public class FrmMensualidades extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnGenerarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnGenerarActionPerformed
+
+    private void btnMostrarMensualidadesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarMensualidadesActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnMostrarMensualidadesActionPerformed
+
+    private void btnFiltrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFiltrarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnFiltrarActionPerformed
+
+    private void btnCancelarMensuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarMensuActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCancelarMensuActionPerformed
+
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -369,6 +414,7 @@ public class FrmMensualidades extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancelarMensu;
     private javax.swing.JButton btnFiltrar;
     private javax.swing.JButton btnGenerar;
     private javax.swing.JButton btnLimpiar;
@@ -376,7 +422,6 @@ public class FrmMensualidades extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> cmbFiltroInquilino;
     private javax.swing.JComboBox<String> cmbGenerarMes;
     private javax.swing.JComboBox<String> cmbMes;
-    private javax.swing.JButton jButton1;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
