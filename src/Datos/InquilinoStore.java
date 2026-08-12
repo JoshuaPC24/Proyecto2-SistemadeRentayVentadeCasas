@@ -137,6 +137,36 @@ public class InquilinoStore {
     }
 
     /**
+     * Busca inquilinos por nombre o por número de cédula.
+     *
+     * Sirve para la caja de búsqueda de la ventana de inquilinos.
+     */
+    public static ArrayList<Inquilino> buscarPorTexto(String texto) {
+
+        ArrayList<Inquilino> resultado = new ArrayList<>();
+
+        if (texto == null) {
+            return resultado;
+        }
+
+        String busqueda = texto.trim().toLowerCase();
+
+        for (int i = 0; i < listaInquilinos.size(); i++) {
+
+            Inquilino inquilino = listaInquilinos.get(i);
+
+            String nombre = inquilino.getNomInqui().toLowerCase();
+            String cedula = String.valueOf(inquilino.getCedInqui());
+
+            if (nombre.contains(busqueda) || cedula.contains(busqueda)) {
+                resultado.add(inquilino);
+            }
+        }
+
+        return resultado;
+    }
+
+    /**
      * Retorna la cantidad de inquilinos registrados.
      */
     public static int cantidad() {

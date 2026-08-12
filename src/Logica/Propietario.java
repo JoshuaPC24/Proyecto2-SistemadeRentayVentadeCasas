@@ -1,5 +1,11 @@
 package Logica;
 
+/**
+ * Guarda la información de los dueños de las viviendas
+ * que se dan en alquiler.
+ *
+ * La cédula (cedPropiet) es única, no se puede repetir.
+ */
 public class Propietario {
 
     private int cedPropiet;

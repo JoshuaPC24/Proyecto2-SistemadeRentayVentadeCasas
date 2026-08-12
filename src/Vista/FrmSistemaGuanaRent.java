@@ -6,8 +6,14 @@ package Vista;
 
 import java.awt.Image;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 /**
+ * Ventana principal del sistema GuanaRent.
+ *
+ * Desde aquí se abren los módulos de propietarios, inquilinos, viviendas,
+ * alquileres, mensualidades y ganancias, ya sea con los botones del panel
+ * izquierdo o con la barra de menú.
  *
  * @author mauri
  */
@@ -21,6 +27,10 @@ public class FrmSistemaGuanaRent extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
         setTitle("Sistema de Alquileres GuanaRent");
+
+        // Los items del menú no tienen evento creado en el diseñador,
+        // por eso aquí se les conecta el mismo código de los botones.
+        conectarMenu();
 
         java.net.URL rutaImagen
                 = getClass().getResource("/imagenes/alquiler.jpg");
@@ -238,39 +248,130 @@ public class FrmSistemaGuanaRent extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnPropietariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPropietariosActionPerformed
-        DlgPropietarios ventana = new DlgPropietarios(this, true);
 
+        // Se abre sin modalidad porque la ventana de registro de
+        // propietarios es un JFrame y no se podría usar si esta
+        // ventana bloqueara la pantalla.
+        DlgPropietarios ventana = new DlgPropietarios(this, false);
         ventana.setLocationRelativeTo(this);
         ventana.setVisible(true);
     }//GEN-LAST:event_btnPropietariosActionPerformed
 
     private void btnInquilinosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInquilinosActionPerformed
+
         DlgInquilinos ventana = new DlgInquilinos(this, true);
         ventana.setLocationRelativeTo(this);
         ventana.setVisible(true);
     }//GEN-LAST:event_btnInquilinosActionPerformed
 
     private void btnViviendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViviendasActionPerformed
+
         DlgViviendas ventana = new DlgViviendas(this, true);
         ventana.setLocationRelativeTo(this);
         ventana.setVisible(true);
     }//GEN-LAST:event_btnViviendasActionPerformed
 
     private void btnAlquileresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAlquileresActionPerformed
+
         DlgAlquileres ventana = new DlgAlquileres(this, true);
         ventana.setLocationRelativeTo(this);
         ventana.setVisible(true);
     }//GEN-LAST:event_btnAlquileresActionPerformed
 
     private void btnMensualidadesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMensualidadesActionPerformed
-        FrmMensualidades ventana = new FrmMensualidades();
+
+        DlgMensualidades ventana = new DlgMensualidades(this, true);
         ventana.setLocationRelativeTo(this);
         ventana.setVisible(true);
     }//GEN-LAST:event_btnMensualidadesActionPerformed
 
     private void btnGananciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGananciasActionPerformed
-        // TODO add your handling code here:
+
+        DlgGanancias ventana = new DlgGanancias(this, true);
+        ventana.setLocationRelativeTo(this);
+        ventana.setVisible(true);
     }//GEN-LAST:event_btnGananciasActionPerformed
+
+    private void mnuAcercaDeActionPerformed(java.awt.event.ActionEvent evt) {
+
+        JOptionPane.showMessageDialog(this,
+                "Sistema de Alquileres GuanaRent\n"
+                + "Programación I - Proyecto II\n\n"
+                + "Anthony Ortega\n"
+                + "Alejandro Oviedo\n"
+                + "Joshua Davison",
+                "Acerca de",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void mnuSalirActionPerformed(java.awt.event.ActionEvent evt) {
+
+        int respuesta = JOptionPane.showConfirmDialog(this,
+                "¿Desea salir del sistema?",
+                "Salir",
+                JOptionPane.YES_NO_OPTION);
+
+        if (respuesta == JOptionPane.YES_OPTION) {
+            System.exit(0);
+        }
+    }
+
+    /**
+     * Conecta cada opción de la barra de menú con su evento.
+     *
+     * Las opciones del menú hacen lo mismo que los botones, por eso
+     * llaman al evento del botón que les corresponde.
+     */
+    private void conectarMenu() {
+
+        mnuPropietarios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPropietariosActionPerformed(evt);
+            }
+        });
+
+        mnuInquilinos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInquilinosActionPerformed(evt);
+            }
+        });
+
+        mnuViviendas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnViviendasActionPerformed(evt);
+            }
+        });
+
+        mnuAlquileres.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAlquileresActionPerformed(evt);
+            }
+        });
+
+        mnuMensualidades.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMensualidadesActionPerformed(evt);
+            }
+        });
+
+        mnuGanancias.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGananciasActionPerformed(evt);
+            }
+        });
+
+        mnuAcercaDe.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAcercaDeActionPerformed(evt);
+            }
+        });
+
+        mnuSalir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSalirActionPerformed(evt);
+            }
+        });
+    }
 
     /**
      * @param args the command line arguments

@@ -4,7 +4,20 @@
  */
 package Vista;
 
+import Datos.AlquilerStore;
+import Datos.InquilinoStore;
+import Logica.Inquilino;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
+ * Ventana con el listado de inquilinos.
+ *
+ * Permite buscar, agregar, editar y eliminar inquilinos del
+ * ArrayList que se encuentra en InquilinoStore.
  *
  * @author mauri
  */
@@ -14,8 +27,45 @@ public class DlgInquilinos extends javax.swing.JDialog {
      * Creates new form DlgInquilinos
      */
     public DlgInquilinos(java.awt.Frame parent, boolean modal) {
+
         super(parent, modal);
         initComponents();
+
+        // Estos botones no tienen evento creado en el diseñador,
+        // por eso aquí se les conecta su código.
+        conectarBotones();
+
+        cargarTabla();
+    }
+
+    /**
+     * Conecta los botones Nuevo, Editar, Eliminar y Cerrar con su evento.
+     */
+    private void conectarBotones() {
+
+        btnNuevo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNuevoActionPerformed(evt);
+            }
+        });
+
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
+
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
+
+        btnCerrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCerrarActionPerformed(evt);
+            }
+        });
     }
 
     /**
@@ -234,20 +284,183 @@ public class DlgInquilinos extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarActionPerformed
-        // TODO add your handling code here:
+
+        // Al presionar Enter en la caja se hace la misma búsqueda
+        // que con el botón Buscar.
+        btnBuscarActionPerformed(evt);
     }//GEN-LAST:event_txtBuscarActionPerformed
 
     private void txtInquilinosRegistradosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtInquilinosRegistradosActionPerformed
-        // TODO add your handling code here:
+        // Este campo solo muestra el total, no necesita código.
     }//GEN-LAST:event_txtInquilinosRegistradosActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        // TODO add your handling code here:
+
+        String texto = txtBuscar.getText().trim();
+
+        if (texto.equals("")) {
+            cargarTabla();
+            return;
+        }
+
+        ArrayList<Inquilino> encontrados =
+                InquilinoStore.buscarPorTexto(texto);
+
+        if (encontrados.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "No se encontró ningún inquilino con ese dato.");
+        }
+
+        llenarTabla(encontrados);
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnMostrarTodoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarTodoActionPerformed
-        // TODO add your handling code here:
+        txtBuscar.setText("");
+        cargarTabla();
     }//GEN-LAST:event_btnMostrarTodoActionPerformed
+
+    private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {
+
+        DlgNuevoInquilino ventana =
+                new DlgNuevoInquilino((java.awt.Frame) getOwner(), true);
+
+        ventana.setLocationRelativeTo(this);
+        ventana.setVisible(true);
+
+        cargarTabla();
+    }
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {
+
+        int fila = tblInquilinos.getSelectedRow();
+
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this,
+                    "Seleccione en la tabla el inquilino que desea editar.");
+            return;
+        }
+
+        int cedula = Integer.parseInt(
+                tblInquilinos.getValueAt(fila, 0).toString());
+
+        Inquilino inquilino = InquilinoStore.buscarPorCedula(cedula);
+
+        if (inquilino == null) {
+            JOptionPane.showMessageDialog(this,
+                    "El inquilino ya no existe en el sistema.");
+            cargarTabla();
+            return;
+        }
+
+        DlgNuevoInquilino ventana =
+                new DlgNuevoInquilino((java.awt.Frame) getOwner(), true);
+
+        ventana.cargarInquilino(inquilino);
+        ventana.setLocationRelativeTo(this);
+        ventana.setVisible(true);
+
+        cargarTabla();
+    }
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {
+
+        int fila = tblInquilinos.getSelectedRow();
+
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this,
+                    "Seleccione en la tabla el inquilino que desea eliminar.");
+            return;
+        }
+
+        int cedula = Integer.parseInt(
+                tblInquilinos.getValueAt(fila, 0).toString());
+
+        // Un inquilino con alquileres registrados no se puede borrar
+        if (AlquilerStore.inquilinoTieneAlquiler(cedula)) {
+
+            JOptionPane.showMessageDialog(this,
+                    "No se puede eliminar: el inquilino tiene "
+                    + "alquileres registrados.");
+            return;
+        }
+
+        int respuesta = JOptionPane.showConfirmDialog(this,
+                "¿Seguro que desea eliminar este inquilino?",
+                "Eliminar",
+                JOptionPane.YES_NO_OPTION);
+
+        if (respuesta == JOptionPane.YES_OPTION) {
+
+            if (InquilinoStore.eliminarPorCedula(cedula)) {
+
+                JOptionPane.showMessageDialog(this,
+                        "Inquilino eliminado correctamente.");
+                cargarTabla();
+
+            } else {
+
+                JOptionPane.showMessageDialog(this,
+                        "No se pudo eliminar el inquilino.");
+            }
+        }
+    }
+
+    private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {
+        dispose();
+    }
+
+    /**
+     * Muestra en la tabla todos los inquilinos del ArrayList.
+     */
+    public void cargarTabla() {
+        llenarTabla(InquilinoStore.getListaInquilinos());
+    }
+
+    /**
+     * Pasa la lista de inquilinos recibida a la tabla.
+     */
+    private void llenarTabla(ArrayList<Inquilino> lista) {
+
+        DefaultTableModel modelo =
+                (DefaultTableModel) tblInquilinos.getModel();
+
+        modelo.setRowCount(0);
+
+        for (int i = 0; i < lista.size(); i++) {
+
+            Inquilino inquilino = lista.get(i);
+
+            Object[] fila = new Object[8];
+            fila[0] = inquilino.getCedInqui();
+            fila[1] = inquilino.getNomInqui();
+            fila[2] = inquilino.getGenero();
+            fila[3] = formatearFecha(inquilino.getFechNac());
+            fila[4] = inquilino.getDireccion();
+            fila[5] = inquilino.getTelefono();
+            fila[6] = inquilino.getEmail();
+            fila[7] = inquilino.getOcupacion();
+
+            modelo.addRow(fila);
+        }
+
+        txtInquilinosRegistrados.setText(
+                String.valueOf(InquilinoStore.cantidad()));
+    }
+
+    /**
+     * Convierte una fecha al formato dd/MM/yyyy para mostrarla.
+     */
+    private String formatearFecha(LocalDate fecha) {
+
+        if (fecha == null) {
+            return "";
+        }
+
+        DateTimeFormatter formato =
+                DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        return fecha.format(formato);
+    }
 
     /**
      * @param args the command line arguments

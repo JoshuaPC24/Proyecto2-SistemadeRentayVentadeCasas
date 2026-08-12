@@ -4,18 +4,151 @@
  */
 package Vista;
 
+import Datos.AlquilerStore;
+import Datos.InquilinoStore;
+import Datos.ViviendaStore;
+import Logica.Alquileres;
+import Logica.Inquilino;
+import Logica.Vivienda;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+
 /**
+ * Ventana para registrar un alquiler nuevo o para editar uno
+ * que ya existe en el ArrayList de alquileres.
+ *
+ * El inquilino y la vivienda se guardan como objetos, por eso
+ * los dos deben existir antes de crear el contrato.
  *
  * @author mauri
  */
 public class DlgNuevoAlquiler extends javax.swing.JDialog {
 
     /**
+     * Alquiler que se está editando.
+     * Si vale null quiere decir que se está registrando uno nuevo.
+     */
+    private Alquileres alquilerEditar = null;
+
+    /**
      * Creates new form DlgNuevoAlquiler
      */
     public DlgNuevoAlquiler(java.awt.Frame parent, boolean modal) {
+
         super(parent, modal);
         initComponents();
+
+        cargarInquilinos();
+        cargarViviendas(null);
+        cargarEstados();
+
+        // El número de alquiler es consecutivo
+        txtnumAlquiler.setText(
+                String.valueOf(AlquilerStore.generarNumeroAlquiler()));
+
+        datePicker1.setDate(LocalDate.now());
+    }
+
+    /**
+     * Llena el combo con los inquilinos registrados.
+     */
+    private void cargarInquilinos() {
+
+        cmbInquilino.removeAllItems();
+        cmbInquilino.addItem("Seleccione Inquilino...");
+
+        ArrayList<Inquilino> lista =
+                InquilinoStore.getListaInquilinos();
+
+        for (int i = 0; i < lista.size(); i++) {
+
+            Inquilino inquilino = lista.get(i);
+
+            cmbInquilino.addItem(inquilino.getCedInqui()
+                    + " - " + inquilino.getNomInqui());
+        }
+    }
+
+    /**
+     * Llena el combo con las viviendas disponibles.
+     *
+     * Cuando se está editando también se agrega la vivienda que ya
+     * tiene el contrato, porque esa aparece como alquilada.
+     */
+    private void cargarViviendas(Vivienda viviendaActual) {
+
+        jComboBox1.removeAllItems();
+        jComboBox1.addItem("Seleccione Vivienda Disponible...");
+
+        ArrayList<Vivienda> disponibles =
+                ViviendaStore.obtenerDisponibles();
+
+        for (int i = 0; i < disponibles.size(); i++) {
+
+            Vivienda vivienda = disponibles.get(i);
+
+            jComboBox1.addItem(vivienda.getIdVivienda()
+                    + " - " + vivienda.getDescripcion());
+        }
+
+        if (viviendaActual != null
+                && !"Disponible".equalsIgnoreCase(
+                        viviendaActual.getEstado())) {
+
+            jComboBox1.addItem(viviendaActual.getIdVivienda()
+                    + " - " + viviendaActual.getDescripcion());
+        }
+    }
+
+    /**
+     * Llena el combo con los estados que puede tener un contrato.
+     */
+    private void cargarEstados() {
+
+        cmbEstado.removeAllItems();
+        cmbEstado.addItem("Seleccione el Estado...");
+        cmbEstado.addItem("Vigente");
+        cmbEstado.addItem("Vencido");
+        cmbEstado.addItem("Cancelado");
+    }
+
+    /**
+     * Carga en pantalla los datos de un alquiler para editarlo.
+     */
+    public void cargarAlquiler(Alquileres alquiler) {
+
+        this.alquilerEditar = alquiler;
+
+        txtnumAlquiler.setText(String.valueOf(alquiler.getNumAlquiler()));
+        datePicker1.setDate(alquiler.getFechContrato());
+        txtcantMeses.setText(String.valueOf(alquiler.getCantMeses()));
+        txtMetConstruccion.setText(String.valueOf(alquiler.getNumAdultos()));
+        txtcantNiños.setText(String.valueOf(alquiler.getNumNinos()));
+        txtDepositoGaran.setText(
+                String.valueOf(alquiler.getDepositoGarantia()));
+        txtPrecioAlquilerMen.setText(
+                String.valueOf(alquiler.getPrecioAlquiler()));
+        txtPorcentajeIncrementoAnual.setText(
+                String.valueOf(alquiler.getPorcIncremAnual()));
+
+        if (alquiler.getInquilino() != null) {
+
+            cmbInquilino.setSelectedItem(
+                    alquiler.getInquilino().getCedInqui()
+                    + " - " + alquiler.getInquilino().getNomInqui());
+        }
+
+        cargarViviendas(alquiler.getVivienda());
+
+        if (alquiler.getVivienda() != null) {
+
+            jComboBox1.setSelectedItem(
+                    alquiler.getVivienda().getIdVivienda()
+                    + " - " + alquiler.getVivienda().getDescripcion());
+        }
+
+        cmbEstado.setSelectedItem(alquiler.getEstado());
     }
 
     /**
@@ -56,6 +189,7 @@ public class DlgNuevoAlquiler extends javax.swing.JDialog {
         txtDepositoGaran = new javax.swing.JTextField();
         jComboBox1 = new javax.swing.JComboBox<>();
         jLabel16 = new javax.swing.JLabel();
+        datePicker1 = new com.github.lgooddatepicker.components.DatePicker();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -177,7 +311,6 @@ public class DlgNuevoAlquiler extends javax.swing.JDialog {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtnumAlquiler, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(jComboBox1, 0, 223, Short.MAX_VALUE)
@@ -189,7 +322,10 @@ public class DlgNuevoAlquiler extends javax.swing.JDialog {
                                 .addComponent(txtPorcentajeIncrementoAnual, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
                                 .addComponent(txtPrecioAlquilerMen, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(txtDepositoGaran, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(txtcantNiños, javax.swing.GroupLayout.Alignment.LEADING)))
+                                .addComponent(txtcantNiños, javax.swing.GroupLayout.Alignment.LEADING))
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(datePicker1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtnumAlquiler, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -210,7 +346,9 @@ public class DlgNuevoAlquiler extends javax.swing.JDialog {
                     .addComponent(jLabel1)
                     .addComponent(txtnumAlquiler, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jLabel2)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(datePicker1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
@@ -277,19 +415,341 @@ public class DlgNuevoAlquiler extends javax.swing.JDialog {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        // TODO add your handling code here:
+
+        if (!validarCampos()) {
+            return;
+        }
+
+        Inquilino inquilino = obtenerInquilinoSeleccionado();
+
+        if (inquilino == null) {
+            JOptionPane.showMessageDialog(this,
+                    "El inquilino seleccionado no existe en el sistema.");
+            return;
+        }
+
+        Vivienda vivienda = obtenerViviendaSeleccionada();
+
+        if (vivienda == null) {
+            JOptionPane.showMessageDialog(this,
+                    "La vivienda seleccionada no existe en el sistema.");
+            return;
+        }
+
+        int numero = Integer.parseInt(txtnumAlquiler.getText().trim());
+        LocalDate fecha = datePicker1.getDate();
+        int meses = Integer.parseInt(txtcantMeses.getText().trim());
+        int adultos = Integer.parseInt(
+                txtMetConstruccion.getText().trim());
+        int ninos = Integer.parseInt(txtcantNiños.getText().trim());
+        double deposito = Double.parseDouble(
+                txtDepositoGaran.getText().trim().replace(",", "."));
+        double precio = Double.parseDouble(
+                txtPrecioAlquilerMen.getText().trim().replace(",", "."));
+        double porcentaje = Double.parseDouble(
+                txtPorcentajeIncrementoAnual.getText().trim()
+                        .replace(",", "."));
+        String estado = cmbEstado.getSelectedItem().toString();
+
+        if (alquilerEditar == null) {
+
+            // Registro nuevo
+            if (!"Disponible".equalsIgnoreCase(vivienda.getEstado())) {
+
+                JOptionPane.showMessageDialog(this,
+                        "La vivienda no está disponible para alquilar.");
+                return;
+            }
+
+            Alquileres nuevo = new Alquileres(
+                    numero, fecha, meses, adultos, ninos,
+                    deposito, precio, porcentaje,
+                    inquilino, vivienda, estado);
+
+            if (AlquilerStore.insertar(nuevo)) {
+
+                JOptionPane.showMessageDialog(this,
+                        "Alquiler registrado correctamente.");
+                dispose();
+
+            } else {
+
+                JOptionPane.showMessageDialog(this,
+                        "No se pudo registrar el alquiler.\n"
+                        + "Revise que el número no esté repetido y "
+                        + "que la vivienda esté disponible.");
+            }
+
+        } else {
+
+            // Modificación de un alquiler existente
+            int indice = AlquilerStore.buscarIndice(
+                    alquilerEditar.getNumAlquiler());
+
+            Alquileres modificado = new Alquileres(
+                    numero, fecha, meses, adultos, ninos,
+                    deposito, precio, porcentaje,
+                    inquilino, vivienda, estado);
+
+            if (AlquilerStore.modificar(indice, modificado)) {
+
+                JOptionPane.showMessageDialog(this,
+                        "Alquiler modificado correctamente.");
+                dispose();
+
+            } else {
+
+                JOptionPane.showMessageDialog(this,
+                        "No se pudo modificar el alquiler.\n"
+                        + "Revise que el número no esté repetido.");
+            }
+        }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        // TODO add your handling code here:
+        dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
+
+    /**
+     * Busca en el ArrayList el inquilino elegido en el combo.
+     */
+    private Inquilino obtenerInquilinoSeleccionado() {
+
+        String seleccion = cmbInquilino.getSelectedItem().toString();
+
+        int posicionGuion = seleccion.indexOf(" - ");
+
+        if (posicionGuion == -1) {
+            return null;
+        }
+
+        try {
+
+            int cedula = Integer.parseInt(
+                    seleccion.substring(0, posicionGuion).trim());
+
+            return InquilinoStore.buscarPorCedula(cedula);
+
+        } catch (NumberFormatException error) {
+            return null;
+        }
+    }
+
+    /**
+     * Busca en el ArrayList la vivienda elegida en el combo.
+     */
+    private Vivienda obtenerViviendaSeleccionada() {
+
+        String seleccion = jComboBox1.getSelectedItem().toString();
+
+        int posicionGuion = seleccion.indexOf(" - ");
+
+        if (posicionGuion == -1) {
+            return null;
+        }
+
+        try {
+
+            int id = Integer.parseInt(
+                    seleccion.substring(0, posicionGuion).trim());
+
+            return ViviendaStore.buscarPorId(id);
+
+        } catch (NumberFormatException error) {
+            return null;
+        }
+    }
+
+    /**
+     * Revisa que todos los datos digitados sean correctos.
+     *
+     * @return true si todo está bien, false si hay algún error
+     */
+    private boolean validarCampos() {
+
+        String numero = txtnumAlquiler.getText().trim();
+
+        if (numero.equals("")) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe digitar el número del alquiler.");
+            txtnumAlquiler.requestFocus();
+            return false;
+        }
+
+        try {
+
+            if (Integer.parseInt(numero) <= 0) {
+                JOptionPane.showMessageDialog(this,
+                        "El número del alquiler debe ser mayor que cero.");
+                return false;
+            }
+
+        } catch (NumberFormatException error) {
+
+            JOptionPane.showMessageDialog(this,
+                    "El número del alquiler solo puede tener números.");
+            return false;
+        }
+
+        if (datePicker1.getDate() == null) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar la fecha del contrato.");
+            return false;
+        }
+
+        if (!enteroValido(txtcantMeses.getText(),
+                "la cantidad de meses", 1)) {
+            return false;
+        }
+
+        if (!enteroValido(txtMetConstruccion.getText(),
+                "la cantidad de adultos", 1)) {
+            return false;
+        }
+
+        if (!enteroValido(txtcantNiños.getText(),
+                "la cantidad de niños", 0)) {
+            return false;
+        }
+
+        if (!decimalValido(txtDepositoGaran.getText(),
+                "el depósito de garantía", 0)) {
+            return false;
+        }
+
+        if (!decimalValido(txtPrecioAlquilerMen.getText(),
+                "el precio del alquiler", 1)) {
+            return false;
+        }
+
+        String porcentaje = txtPorcentajeIncrementoAnual.getText()
+                .trim().replace(",", ".");
+
+        if (porcentaje.equals("")) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe digitar el porcentaje de incremento anual.");
+            return false;
+        }
+
+        try {
+
+            double valor = Double.parseDouble(porcentaje);
+
+            if (valor < 1 || valor > 30) {
+                JOptionPane.showMessageDialog(this,
+                        "El porcentaje de incremento debe estar "
+                        + "entre 1 y 30.");
+                return false;
+            }
+
+        } catch (NumberFormatException error) {
+
+            JOptionPane.showMessageDialog(this,
+                    "El porcentaje de incremento debe ser un número.");
+            return false;
+        }
+
+        if (cmbInquilino.getSelectedIndex() <= 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar el inquilino.\n"
+                    + "Si no aparece, regístrelo primero.");
+            return false;
+        }
+
+        if (jComboBox1.getSelectedIndex() <= 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar la vivienda.\n"
+                    + "Solo aparecen las viviendas disponibles.");
+            return false;
+        }
+
+        if (cmbEstado.getSelectedIndex() <= 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar el estado del contrato.");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Revisa que el texto sea un número entero mayor o igual al mínimo.
+     */
+    private boolean enteroValido(String texto, String nombreCampo,
+            int minimo) {
+
+        String valor = texto.trim();
+
+        if (valor.equals("")) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe digitar " + nombreCampo + ".");
+            return false;
+        }
+
+        try {
+
+            int numero = Integer.parseInt(valor);
+
+            if (numero < minimo) {
+                JOptionPane.showMessageDialog(this,
+                        "El valor de " + nombreCampo
+                        + " no puede ser menor que " + minimo + ".");
+                return false;
+            }
+
+        } catch (NumberFormatException error) {
+
+            JOptionPane.showMessageDialog(this,
+                    "El valor de " + nombreCampo
+                    + " debe ser un número entero.");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Revisa que el texto sea un número mayor o igual al mínimo
+     * (puede llevar decimales).
+     */
+    private boolean decimalValido(String texto, String nombreCampo,
+            double minimo) {
+
+        String valor = texto.trim().replace(",", ".");
+
+        if (valor.equals("")) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe digitar " + nombreCampo + ".");
+            return false;
+        }
+
+        try {
+
+            double numero = Double.parseDouble(valor);
+
+            if (numero < minimo) {
+                JOptionPane.showMessageDialog(this,
+                        "El valor de " + nombreCampo
+                        + " no puede ser menor que " + minimo + ".");
+                return false;
+            }
+
+        } catch (NumberFormatException error) {
+
+            JOptionPane.showMessageDialog(this,
+                    "El valor de " + nombreCampo + " debe ser un número.");
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * @param args the command line arguments
@@ -338,6 +798,7 @@ public class DlgNuevoAlquiler extends javax.swing.JDialog {
     private javax.swing.JButton btnGuardar;
     private javax.swing.JComboBox<String> cmbEstado;
     private javax.swing.JComboBox<String> cmbInquilino;
+    private com.github.lgooddatepicker.components.DatePicker datePicker1;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;

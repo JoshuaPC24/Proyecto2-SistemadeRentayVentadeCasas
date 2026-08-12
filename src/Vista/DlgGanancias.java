@@ -4,7 +4,23 @@
  */
 package Vista;
 
+import Datos.AlquilerStore;
+import Datos.MensualidadStore;
+import Logica.Alquileres;
+import Logica.Mensualidades;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import javax.swing.ButtonGroup;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
+ * Ventana del módulo de ganancias.
+ *
+ * GuanaRent gana la mitad del depósito de garantía de cada alquiler
+ * y un 5% de cada mensualidad. Las ganancias se pueden consultar de
+ * todo un año o de un mes específico.
  *
  * @author mauri
  */
@@ -14,8 +30,23 @@ public class DlgGanancias extends javax.swing.JDialog {
      * Creates new form DlgGanancias
      */
     public DlgGanancias(java.awt.Frame parent, boolean modal) {
+
         super(parent, modal);
         initComponents();
+
+        // Los dos radio botones deben trabajar juntos, así solo se
+        // puede escoger una opción a la vez.
+        ButtonGroup grupoConsulta = new ButtonGroup();
+        grupoConsulta.add(rdoPorMes);
+        grupoConsulta.add(rdoPorAnio);
+
+        spnAnio.setValue(LocalDate.now().getYear());
+
+        // La tabla viene con filas vacías desde el diseñador
+        DefaultTableModel modelo =
+                (DefaultTableModel) tblAlquileresGanancias.getModel();
+
+        modelo.setRowCount(0);
     }
 
     /**
@@ -292,8 +323,201 @@ public class DlgGanancias extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCalcularGananciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCalcularGananciasActionPerformed
-        // TODO add your handling code here:
+
+        if (!rdoPorMes.isSelected() && !rdoPorAnio.isSelected()) {
+
+            JOptionPane.showMessageDialog(this,
+                    "Seleccione si desea la ganancia por mes "
+                    + "o por año.");
+            return;
+        }
+
+        int anio = leerAnio();
+
+        if (anio == 0) {
+            return;
+        }
+
+        // Si la consulta es por año se usa 0 para indicar
+        // que se toman todos los meses.
+        int mes = 0;
+
+        if (rdoPorMes.isSelected()) {
+            mes = cboMes.getSelectedIndex() + 1;
+        }
+
+        double gananciaDepositos = calcularGananciaDepositos(mes, anio);
+        double gananciaMensualidades =
+                calcularGananciaMensualidades(mes, anio);
+
+        double total = gananciaDepositos + gananciaMensualidades;
+
+        jLabel6.setText(formatearMonto(gananciaDepositos));
+        jLabel8.setText(formatearMonto(gananciaMensualidades));
+        jLabel3.setText(formatearMonto(total));
+
+        cargarTablaDepositos(mes, anio);
     }//GEN-LAST:event_btnCalcularGananciasActionPerformed
+
+    /**
+     * Suma la mitad del depósito de garantía de cada alquiler
+     * del periodo consultado.
+     *
+     * @param mes número del mes o 0 para todo el año
+     * @param anio año consultado
+     * @return la ganancia por depósitos
+     */
+    private double calcularGananciaDepositos(int mes, int anio) {
+
+        double ganancia = 0;
+
+        ArrayList<Alquileres> lista =
+                AlquilerStore.getListaAlquileres();
+
+        for (int i = 0; i < lista.size(); i++) {
+
+            Alquileres alquiler = lista.get(i);
+
+            if (esDelPeriodo(alquiler, mes, anio)) {
+                ganancia = ganancia
+                        + alquiler.getDepositoGarantia() * 0.50;
+            }
+        }
+
+        return ganancia;
+    }
+
+    /**
+     * Suma el 5% de cada mensualidad del periodo consultado.
+     *
+     * @param mes número del mes o 0 para todo el año
+     * @param anio año consultado
+     * @return la ganancia por mensualidades
+     */
+    private double calcularGananciaMensualidades(int mes, int anio) {
+
+        double ganancia = 0;
+
+        ArrayList<Mensualidades> lista =
+                MensualidadStore.filtrar("", mes, anio);
+
+        for (int i = 0; i < lista.size(); i++) {
+            ganancia = ganancia + lista.get(i).getMontoMes() * 0.05;
+        }
+
+        return ganancia;
+    }
+
+    /**
+     * Revisa si el contrato de alquiler se firmó en el periodo.
+     */
+    private boolean esDelPeriodo(Alquileres alquiler, int mes, int anio) {
+
+        if (alquiler.getFechContrato() == null) {
+            return false;
+        }
+
+        if (alquiler.getFechContrato().getYear() != anio) {
+            return false;
+        }
+
+        if (mes != 0
+                && alquiler.getFechContrato().getMonthValue() != mes) {
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Muestra en la tabla los alquileres que dejaron ganancia
+     * por depósito en el periodo consultado.
+     */
+    private void cargarTablaDepositos(int mes, int anio) {
+
+        DefaultTableModel modelo =
+                (DefaultTableModel) tblAlquileresGanancias.getModel();
+
+        modelo.setRowCount(0);
+
+        ArrayList<Alquileres> lista =
+                AlquilerStore.getListaAlquileres();
+
+        for (int i = 0; i < lista.size(); i++) {
+
+            Alquileres alquiler = lista.get(i);
+
+            if (!esDelPeriodo(alquiler, mes, anio)) {
+                continue;
+            }
+
+            String nombreInquilino = "Sin inquilino";
+
+            if (alquiler.getInquilino() != null) {
+                nombreInquilino = alquiler.getInquilino().getNomInqui();
+            }
+
+            Object[] fila = new Object[5];
+            fila[0] = alquiler.getNumAlquiler();
+            fila[1] = formatearFecha(alquiler.getFechContrato());
+            fila[2] = nombreInquilino;
+            fila[3] = alquiler.getDepositoGarantia();
+            fila[4] = formatearMonto(
+                    alquiler.getDepositoGarantia() * 0.50);
+
+            modelo.addRow(fila);
+        }
+    }
+
+    /**
+     * Lee el año del control y revisa que sea válido.
+     *
+     * @return el año o 0 si el dato está malo
+     */
+    private int leerAnio() {
+
+        try {
+
+            int anio = Integer.parseInt(spnAnio.getValue().toString());
+
+            if (anio < 1000 || anio > 9999) {
+                JOptionPane.showMessageDialog(this,
+                        "El año debe tener 4 dígitos. Ejemplo: 2026");
+                return 0;
+            }
+
+            return anio;
+
+        } catch (NumberFormatException error) {
+
+            JOptionPane.showMessageDialog(this,
+                    "El año digitado no es válido.");
+            return 0;
+        }
+    }
+
+    /**
+     * Deja el monto con dos decimales para mostrarlo.
+     */
+    private String formatearMonto(double monto) {
+        return String.format("%.2f", monto);
+    }
+
+    /**
+     * Convierte una fecha al formato dd/MM/yyyy para mostrarla.
+     */
+    private String formatearFecha(LocalDate fecha) {
+
+        if (fecha == null) {
+            return "";
+        }
+
+        DateTimeFormatter formato =
+                DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        return fecha.format(formato);
+    }
 
     /**
      * @param args the command line arguments

@@ -4,18 +4,88 @@
  */
 package Vista;
 
+import Datos.PropietarioStore;
+import Datos.ViviendaStore;
+import Logica.Propietario;
+import Logica.Vivienda;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+
 /**
+ * Ventana para registrar una vivienda nueva o para editar una
+ * que ya existe en el ArrayList de viviendas.
+ *
+ * La vivienda guarda un objeto de tipo Propietario (agregación),
+ * por eso el propietario debe existir antes de registrar la casa.
  *
  * @author mauri
  */
 public class DlgNuevaVivienda extends javax.swing.JDialog {
 
     /**
+     * Vivienda que se está editando.
+     * Si vale null quiere decir que se está registrando una nueva.
+     */
+    private Vivienda viviendaEditar = null;
+
+    /**
      * Creates new form DlgNuevaVivienda
      */
     public DlgNuevaVivienda(java.awt.Frame parent, boolean modal) {
+
         super(parent, modal);
         initComponents();
+        cargarPropietarios();
+    }
+
+    /**
+     * Llena el combo con los propietarios registrados.
+     */
+    private void cargarPropietarios() {
+
+        cmbPropietario.removeAllItems();
+        cmbPropietario.addItem("Seleccione");
+
+        ArrayList<Propietario> lista =
+                PropietarioStore.getListaPropietarios();
+
+        for (int i = 0; i < lista.size(); i++) {
+
+            Propietario propietario = lista.get(i);
+
+            cmbPropietario.addItem(propietario.getCedPropiet()
+                    + " - " + propietario.getNomPropiet());
+        }
+    }
+
+    /**
+     * Carga en pantalla los datos de una vivienda para editarla.
+     */
+    public void cargarVivienda(Vivienda vivienda) {
+
+        this.viviendaEditar = vivienda;
+
+        txtIdVivienda.setText(String.valueOf(vivienda.getIdVivienda()));
+        txtDescripcion.setText(vivienda.getDescripcion());
+        txtDireccion.setText(vivienda.getDireccion());
+        txtMetConstruccion.setText(String.valueOf(vivienda.getMtsConstruct()));
+        txtMetrosLote.setText(String.valueOf(vivienda.getMtsLote()));
+        cmbTipoConstruccion.setSelectedItem(vivienda.getTipoConstruccion());
+        chkCochera.setSelected(vivienda.isCochera());
+        txtCantHabitaciones.setText(String.valueOf(vivienda.getCantHabitac()));
+        txtCantBaños.setText(String.valueOf(vivienda.getCantBanios()));
+        cmbTipoCarretera.setSelectedItem(vivienda.getCarretera());
+        txtPrecioBase.setText(String.valueOf(vivienda.getPrecioBase()));
+        txtDepositoGarantia.setText(
+                String.valueOf(vivienda.getDepositoGarantia()));
+        cmbEstado.setSelectedItem(vivienda.getEstado());
+
+        if (vivienda.getPropietario() != null) {
+
+            cmbPropietario.setSelectedItem(
+                    vivienda.getPropietario().getCedPropiet()
+                    + " - " + vivienda.getPropietario().getNomPropiet());
+        }
     }
 
     /**
@@ -179,7 +249,12 @@ public class DlgNuevaVivienda extends javax.swing.JDialog {
         jLabel17.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel17.setText("Estado:");
 
-        cmbEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione", "Disponible", "Alquilada", "Activa" }));
+        cmbEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione", "Disponible", "Alquilada", "Inactiva" }));
+        cmbEstado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbEstadoActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -398,16 +473,280 @@ public class DlgNuevaVivienda extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtIdViviendaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdViviendaActionPerformed
-        // TODO add your handling code here:
+        txtDescripcion.requestFocus();
     }//GEN-LAST:event_txtIdViviendaActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        // TODO add your handling code here:
+
+        if (!validarCampos()) {
+            return;
+        }
+
+        Propietario propietario = obtenerPropietarioSeleccionado();
+
+        if (propietario == null) {
+            JOptionPane.showMessageDialog(this,
+                    "El propietario seleccionado no existe en el sistema.");
+            return;
+        }
+
+        int id = Integer.parseInt(txtIdVivienda.getText().trim());
+        String descripcion = txtDescripcion.getText().trim();
+        String direccion = txtDireccion.getText().trim();
+        double mtsConstruct = Double.parseDouble(
+                txtMetConstruccion.getText().trim().replace(",", "."));
+        double mtsLote = Double.parseDouble(
+                txtMetrosLote.getText().trim().replace(",", "."));
+        String tipoConstruccion = cmbTipoConstruccion
+                .getSelectedItem().toString();
+        boolean cochera = chkCochera.isSelected();
+        int cantHabitac = Integer.parseInt(
+                txtCantHabitaciones.getText().trim());
+        double cantBanios = Double.parseDouble(
+                txtCantBaños.getText().trim().replace(",", "."));
+        String carretera = cmbTipoCarretera.getSelectedItem().toString();
+        double precioBase = Double.parseDouble(
+                txtPrecioBase.getText().trim().replace(",", "."));
+        double deposito = Double.parseDouble(
+                txtDepositoGarantia.getText().trim().replace(",", "."));
+        String estado = cmbEstado.getSelectedItem().toString();
+
+        if (viviendaEditar == null) {
+
+            // Registro nuevo
+            Vivienda nueva = new Vivienda(
+                    id, descripcion, direccion, mtsConstruct, mtsLote,
+                    tipoConstruccion, cochera, cantHabitac, cantBanios,
+                    carretera, precioBase, deposito, propietario, estado);
+
+            if (ViviendaStore.insertar(nueva)) {
+
+                JOptionPane.showMessageDialog(this,
+                        "Vivienda registrada correctamente.");
+                dispose();
+
+            } else {
+
+                JOptionPane.showMessageDialog(this,
+                        "Ya existe una vivienda con ese ID.");
+            }
+
+        } else {
+
+            // Modificación de una vivienda existente
+            int indice = ViviendaStore.buscarIndice(
+                    viviendaEditar.getIdVivienda());
+
+            Vivienda modificada = new Vivienda(
+                    id, descripcion, direccion, mtsConstruct, mtsLote,
+                    tipoConstruccion, cochera, cantHabitac, cantBanios,
+                    carretera, precioBase, deposito, propietario, estado);
+
+            if (ViviendaStore.modificar(indice, modificada)) {
+
+                JOptionPane.showMessageDialog(this,
+                        "Vivienda modificada correctamente.");
+                dispose();
+
+            } else {
+
+                JOptionPane.showMessageDialog(this,
+                        "No se pudo modificar. "
+                        + "Ya existe otra vivienda con ese ID.");
+            }
+        }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        // TODO add your handling code here:
+        dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
+
+    /**
+     * Busca en el ArrayList el propietario elegido en el combo.
+     *
+     * En el combo se muestra "cédula - nombre", entonces se toma
+     * la parte de la cédula para poder buscarlo.
+     */
+    private Propietario obtenerPropietarioSeleccionado() {
+
+        String seleccion = cmbPropietario.getSelectedItem().toString();
+
+        int posicionGuion = seleccion.indexOf(" - ");
+
+        if (posicionGuion == -1) {
+            return null;
+        }
+
+        try {
+
+            int cedula = Integer.parseInt(
+                    seleccion.substring(0, posicionGuion).trim());
+
+            return PropietarioStore.buscarPorCedula(cedula);
+
+        } catch (NumberFormatException error) {
+            return null;
+        }
+    }
+
+    /**
+     * Revisa que todos los datos digitados sean correctos.
+     *
+     * @return true si todo está bien, false si hay algún error
+     */
+    private boolean validarCampos() {
+
+        if (!numeroEnteroValido(txtIdVivienda.getText(),
+                "el ID de la vivienda")) {
+            return false;
+        }
+
+        if (txtDescripcion.getText().trim().equals("")) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe digitar la descripción de la vivienda.");
+            txtDescripcion.requestFocus();
+            return false;
+        }
+
+        if (txtDireccion.getText().trim().equals("")) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe digitar la dirección de la vivienda.");
+            txtDireccion.requestFocus();
+            return false;
+        }
+
+        if (!numeroDecimalValido(txtMetConstruccion.getText(),
+                "los metros de construcción")) {
+            return false;
+        }
+
+        if (!numeroDecimalValido(txtMetrosLote.getText(),
+                "los metros de lote")) {
+            return false;
+        }
+
+        if (cmbTipoConstruccion.getSelectedIndex() == 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar el tipo de construcción.");
+            return false;
+        }
+
+        if (!numeroEnteroValido(txtCantHabitaciones.getText(),
+                "la cantidad de habitaciones")) {
+            return false;
+        }
+
+        if (!numeroDecimalValido(txtCantBaños.getText(),
+                "la cantidad de baños")) {
+            return false;
+        }
+
+        if (cmbTipoCarretera.getSelectedIndex() == 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar el tipo de carretera.");
+            return false;
+        }
+
+        if (!numeroDecimalValido(txtPrecioBase.getText(),
+                "el precio base del alquiler")) {
+            return false;
+        }
+
+        if (!numeroDecimalValido(txtDepositoGarantia.getText(),
+                "el depósito de garantía")) {
+            return false;
+        }
+
+        if (cmbPropietario.getSelectedIndex() <= 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar el propietario de la vivienda.\n"
+                    + "Si no aparece, regístrelo primero.");
+            return false;
+        }
+
+        if (cmbEstado.getSelectedIndex() == 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar el estado de la vivienda.");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Revisa que el texto sea un número entero mayor que cero.
+     */
+    private boolean numeroEnteroValido(String texto, String nombreCampo) {
+
+        String valor = texto.trim();
+
+        if (valor.equals("")) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe digitar " + nombreCampo + ".");
+            return false;
+        }
+
+        try {
+
+            int numero = Integer.parseInt(valor);
+
+            if (numero <= 0) {
+                JOptionPane.showMessageDialog(this,
+                        "El valor de " + nombreCampo
+                        + " debe ser mayor que cero.");
+                return false;
+            }
+
+        } catch (NumberFormatException error) {
+
+            JOptionPane.showMessageDialog(this,
+                    "El valor de " + nombreCampo
+                    + " debe ser un número entero.");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Revisa que el texto sea un número mayor que cero
+     * (puede llevar decimales).
+     */
+    private boolean numeroDecimalValido(String texto, String nombreCampo) {
+
+        String valor = texto.trim().replace(",", ".");
+
+        if (valor.equals("")) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe digitar " + nombreCampo + ".");
+            return false;
+        }
+
+        try {
+
+            double numero = Double.parseDouble(valor);
+
+            if (numero <= 0) {
+                JOptionPane.showMessageDialog(this,
+                        "El valor de " + nombreCampo
+                        + " debe ser mayor que cero.");
+                return false;
+            }
+
+        } catch (NumberFormatException error) {
+
+            JOptionPane.showMessageDialog(this,
+                    "El valor de " + nombreCampo + " debe ser un número.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void cmbEstadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbEstadoActionPerformed
+        // El estado se lee hasta el momento de guardar,
+        // por eso este evento no necesita código.
+    }//GEN-LAST:event_cmbEstadoActionPerformed
 
     /**
      * @param args the command line arguments

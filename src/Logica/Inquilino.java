@@ -2,6 +2,12 @@ package Logica;
 
 import java.time.LocalDate;
 
+/**
+ * Guarda la información de las personas que alquilan
+ * o alguna vez alquilaron una vivienda.
+ *
+ * La cédula (cedInqui) es única, no se puede repetir.
+ */
 public class Inquilino {
 
     private int cedInqui;

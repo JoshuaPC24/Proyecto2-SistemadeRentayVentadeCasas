@@ -4,7 +4,19 @@
  */
 package Vista;
 
+import Datos.AlquilerStore;
+import Datos.PropietarioStore;
+import Datos.ViviendaStore;
+import Logica.Vivienda;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
+ * Ventana con el listado de viviendas.
+ *
+ * Permite buscar, agregar, editar y eliminar viviendas del
+ * ArrayList que se encuentra en ViviendaStore.
  *
  * @author mauri
  */
@@ -16,6 +28,7 @@ public class DlgViviendas extends javax.swing.JDialog {
     public DlgViviendas(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        cargarTabla();
     }
 
     /**
@@ -263,36 +276,181 @@ public class DlgViviendas extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarActionPerformed
-        // TODO add your handling code here:
+
+        // Al presionar Enter en la caja se hace la misma búsqueda
+        // que con el botón Buscar.
+        btnBuscarActionPerformed(evt);
     }//GEN-LAST:event_txtBuscarActionPerformed
 
     private void txtViviendasRegistradasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtViviendasRegistradasActionPerformed
-        // TODO add your handling code here:
+        // Este campo solo muestra el total, no necesita código.
     }//GEN-LAST:event_txtViviendasRegistradasActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        // TODO add your handling code here:
+
+        String texto = txtBuscar.getText().trim();
+
+        if (texto.equals("")) {
+            cargarTabla();
+            return;
+        }
+
+        ArrayList<Vivienda> encontradas =
+                ViviendaStore.buscarPorTexto(texto);
+
+        if (encontradas.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "No se encontró ninguna vivienda con ese dato.");
+        }
+
+        llenarTabla(encontradas);
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnMostrarTodoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarTodoActionPerformed
-        // TODO add your handling code here:
+        txtBuscar.setText("");
+        cargarTabla();
     }//GEN-LAST:event_btnMostrarTodoActionPerformed
 
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
-        // TODO add your handling code here:
+
+        // Para registrar una vivienda debe existir al menos un propietario
+        if (PropietarioStore.estaVacio()) {
+
+            JOptionPane.showMessageDialog(this,
+                    "Primero debe registrar al menos un propietario.");
+            return;
+        }
+
+        DlgNuevaVivienda ventana =
+                new DlgNuevaVivienda((java.awt.Frame) getOwner(), true);
+
+        ventana.setLocationRelativeTo(this);
+        ventana.setVisible(true);
+
+        cargarTabla();
     }//GEN-LAST:event_btnNuevoActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
-        // TODO add your handling code here:
+
+        int fila = tblViviendas.getSelectedRow();
+
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this,
+                    "Seleccione en la tabla la vivienda que desea editar.");
+            return;
+        }
+
+        int id = Integer.parseInt(
+                tblViviendas.getValueAt(fila, 0).toString());
+
+        Vivienda vivienda = ViviendaStore.buscarPorId(id);
+
+        if (vivienda == null) {
+            JOptionPane.showMessageDialog(this,
+                    "La vivienda ya no existe en el sistema.");
+            cargarTabla();
+            return;
+        }
+
+        DlgNuevaVivienda ventana =
+                new DlgNuevaVivienda((java.awt.Frame) getOwner(), true);
+
+        ventana.cargarVivienda(vivienda);
+        ventana.setLocationRelativeTo(this);
+        ventana.setVisible(true);
+
+        cargarTabla();
     }//GEN-LAST:event_btnEditarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        // TODO add your handling code here:
+
+        int fila = tblViviendas.getSelectedRow();
+
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this,
+                    "Seleccione en la tabla la vivienda que desea eliminar.");
+            return;
+        }
+
+        int id = Integer.parseInt(
+                tblViviendas.getValueAt(fila, 0).toString());
+
+        // Una vivienda con alquileres registrados no se puede borrar
+        if (AlquilerStore.viviendaTieneAlquiler(id)) {
+
+            JOptionPane.showMessageDialog(this,
+                    "No se puede eliminar: la vivienda tiene "
+                    + "alquileres registrados.");
+            return;
+        }
+
+        int respuesta = JOptionPane.showConfirmDialog(this,
+                "¿Seguro que desea eliminar esta vivienda?",
+                "Eliminar",
+                JOptionPane.YES_NO_OPTION);
+
+        if (respuesta == JOptionPane.YES_OPTION) {
+
+            if (ViviendaStore.eliminarPorId(id)) {
+
+                JOptionPane.showMessageDialog(this,
+                        "Vivienda eliminada correctamente.");
+                cargarTabla();
+
+            } else {
+
+                JOptionPane.showMessageDialog(this,
+                        "No se pudo eliminar: la vivienda está alquilada.");
+            }
+        }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarActionPerformed
-        // TODO add your handling code here:
+        dispose();
     }//GEN-LAST:event_btnCerrarActionPerformed
+
+    /**
+     * Muestra en la tabla todas las viviendas del ArrayList.
+     */
+    public void cargarTabla() {
+        llenarTabla(ViviendaStore.getListaViviendas());
+    }
+
+    /**
+     * Pasa la lista de viviendas recibida a la tabla.
+     */
+    private void llenarTabla(ArrayList<Vivienda> lista) {
+
+        DefaultTableModel modelo =
+                (DefaultTableModel) tblViviendas.getModel();
+
+        modelo.setRowCount(0);
+
+        for (int i = 0; i < lista.size(); i++) {
+
+            Vivienda vivienda = lista.get(i);
+
+            String nombrePropietario = "Sin propietario";
+
+            if (vivienda.getPropietario() != null) {
+                nombrePropietario =
+                        vivienda.getPropietario().getNomPropiet();
+            }
+
+            Object[] fila = new Object[6];
+            fila[0] = vivienda.getIdVivienda();
+            fila[1] = vivienda.getDescripcion();
+            fila[2] = vivienda.getDireccion();
+            fila[3] = nombrePropietario;
+            fila[4] = vivienda.getEstado();
+            fila[5] = vivienda.getPrecioBase();
+
+            modelo.addRow(fila);
+        }
+
+        txtViviendasRegistradas.setText(
+                String.valueOf(ViviendaStore.cantidad()));
+    }
 
     /**
      * @param args the command line arguments

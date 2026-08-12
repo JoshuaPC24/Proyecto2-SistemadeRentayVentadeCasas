@@ -4,17 +4,62 @@
  */
 package Vista;
 
+import Datos.PropietarioStore;
+import Logica.Propietario;
+import javax.swing.JOptionPane;
+
 /**
+ * Ventana para registrar un propietario nuevo o para editar uno
+ * que ya existe en el ArrayList de propietarios.
  *
  * @author mauri
  */
 public class DlgNuevoPropietario extends javax.swing.JFrame {
 
     /**
+     * Propietario que se está editando.
+     * Si vale null quiere decir que se está registrando uno nuevo.
+     */
+    private Propietario propietarioEditar = null;
+
+    /**
+     * Ventana del listado, para poder refrescar la tabla al guardar.
+     */
+    private DlgPropietarios ventanaListado = null;
+
+    /**
      * Creates new form DlgNuevoPropietario
      */
     public DlgNuevoPropietario() {
+
         initComponents();
+
+        // Esta ventana es un JFrame, si se cierra con la X no debe
+        // cerrar todo el sistema, solamente esta ventana.
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+    }
+
+    /**
+     * Guarda la ventana del listado para refrescar la tabla al guardar.
+     */
+    public void setVentanaListado(DlgPropietarios ventanaListado) {
+        this.ventanaListado = ventanaListado;
+    }
+
+    /**
+     * Carga en pantalla los datos de un propietario para editarlo.
+     */
+    public void cargarPropietario(Propietario propietario) {
+
+        this.propietarioEditar = propietario;
+
+        txtCedula.setText(String.valueOf(propietario.getCedPropiet()));
+        txtNombre.setText(propietario.getNomPropiet());
+        cmbGenero.setSelectedItem(propietario.getGenero());
+        txtDireccion.setText(propietario.getDireccion());
+        txtTelefono.setText(propietario.getTelefono());
+        txtCorreo.setText(propietario.getEmail());
     }
 
     /**
@@ -211,12 +256,190 @@ public class DlgNuevoPropietario extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        // TODO add your handling code here:
+
+        if (!validarCampos()) {
+            return;
+        }
+
+        int cedula = Integer.parseInt(txtCedula.getText().trim());
+        String nombre = txtNombre.getText().trim();
+        String genero = cmbGenero.getSelectedItem().toString();
+        String direccion = txtDireccion.getText().trim();
+        String telefono = txtTelefono.getText().trim();
+        String correo = txtCorreo.getText().trim();
+
+        if (propietarioEditar == null) {
+
+            // Registro nuevo
+            Propietario nuevo = new Propietario(
+                    cedula, nombre, genero, direccion, telefono, correo);
+
+            if (PropietarioStore.insertar(nuevo)) {
+
+                JOptionPane.showMessageDialog(this,
+                        "Propietario registrado correctamente.");
+
+                // Se refresca la tabla de la ventana del listado
+                if (ventanaListado != null) {
+                    ventanaListado.cargarTabla();
+                }
+
+                dispose();
+
+            } else {
+
+                JOptionPane.showMessageDialog(this,
+                        "Ya existe un propietario con esa cédula.");
+            }
+
+        } else {
+
+            // Modificación de un propietario existente
+            int indice = PropietarioStore.buscarIndice(
+                    propietarioEditar.getCedPropiet());
+
+            Propietario modificado = new Propietario(
+                    cedula, nombre, genero, direccion, telefono, correo);
+
+            if (PropietarioStore.modificar(indice, modificado)) {
+
+                JOptionPane.showMessageDialog(this,
+                        "Propietario modificado correctamente.");
+
+                // Se refresca la tabla de la ventana del listado
+                if (ventanaListado != null) {
+                    ventanaListado.cargarTabla();
+                }
+
+                dispose();
+
+            } else {
+
+                JOptionPane.showMessageDialog(this,
+                        "No se pudo modificar. "
+                        + "Ya existe otro propietario con esa cédula.");
+            }
+        }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        // TODO add your handling code here:
+        dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
+
+    /**
+     * Revisa que todos los datos digitados sean correctos.
+     *
+     * @return true si todo está bien, false si hay algún error
+     */
+    private boolean validarCampos() {
+
+        String cedula = txtCedula.getText().trim();
+        String nombre = txtNombre.getText().trim();
+        String direccion = txtDireccion.getText().trim();
+        String telefono = txtTelefono.getText().trim();
+        String correo = txtCorreo.getText().trim();
+
+        if (cedula.equals("")) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe digitar la cédula del propietario.");
+            txtCedula.requestFocus();
+            return false;
+        }
+
+        try {
+
+            int numeroCedula = Integer.parseInt(cedula);
+
+            if (numeroCedula <= 0) {
+                JOptionPane.showMessageDialog(this,
+                        "La cédula debe ser un número mayor que cero.");
+                txtCedula.requestFocus();
+                return false;
+            }
+
+        } catch (NumberFormatException error) {
+
+            JOptionPane.showMessageDialog(this,
+                    "La cédula solo puede tener números.");
+            txtCedula.requestFocus();
+            return false;
+        }
+
+        if (nombre.equals("")) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe digitar el nombre del propietario.");
+            txtNombre.requestFocus();
+            return false;
+        }
+
+        if (cmbGenero.getSelectedIndex() == 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar el género.");
+            return false;
+        }
+
+        if (direccion.equals("")) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe digitar la dirección.");
+            txtDireccion.requestFocus();
+            return false;
+        }
+
+        if (!telefonoValido(telefono)) {
+            JOptionPane.showMessageDialog(this,
+                    "El teléfono debe tener 8 números. Ejemplo: 88887777");
+            txtTelefono.requestFocus();
+            return false;
+        }
+
+        if (!correoValido(correo)) {
+            JOptionPane.showMessageDialog(this,
+                    "Digite un correo válido. Ejemplo: nombre@correo.com");
+            txtCorreo.requestFocus();
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Revisa que el teléfono tenga 8 dígitos.
+     */
+    private boolean telefonoValido(String telefono) {
+
+        // Se quitan los guiones y espacios por si el usuario los digita
+        String soloNumeros = telefono.replace("-", "").replace(" ", "");
+
+        if (soloNumeros.length() != 8) {
+            return false;
+        }
+
+        for (int i = 0; i < soloNumeros.length(); i++) {
+
+            if (!Character.isDigit(soloNumeros.charAt(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Revisa que el correo tenga arroba y punto.
+     */
+    private boolean correoValido(String correo) {
+
+        if (correo.equals("")) {
+            return false;
+        }
+
+        int posicionArroba = correo.indexOf("@");
+        int posicionPunto = correo.lastIndexOf(".");
+
+        return posicionArroba > 0
+                && posicionPunto > posicionArroba + 1
+                && posicionPunto < correo.length() - 1;
+    }
 
     /**
      * @param args the command line arguments

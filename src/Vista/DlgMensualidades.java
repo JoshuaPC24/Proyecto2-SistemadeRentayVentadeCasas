@@ -4,18 +4,83 @@
  */
 package Vista;
 
+import Datos.AlquilerStore;
+import Datos.InquilinoStore;
+import Datos.MensualidadStore;
+import Logica.Inquilino;
+import Logica.Mensualidades;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
+ * Ventana del módulo de mensualidades.
+ *
+ * Aquí se generan automáticamente las mensualidades de los alquileres
+ * vigentes de un mes y año, se pueden mostrar en otra ventana y se
+ * pueden filtrar por inquilino, mes y año.
  *
  * @author mauri
  */
 public class DlgMensualidades extends javax.swing.JDialog {
 
     /**
+     * Nombres de los meses para mostrarlos en pantalla.
+     */
+    private final String[] nombresMeses = {
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Setiembre", "Octubre",
+        "Noviembre", "Diciembre"
+    };
+
+    /**
      * Creates new form DlgMensualidades
      */
     public DlgMensualidades(java.awt.Frame parent, boolean modal) {
+
         super(parent, modal);
         initComponents();
+
+        mostrarFechaActual();
+        cargarInquilinosFiltro();
+        cargarTabla(MensualidadStore.getListaMensualidades());
+    }
+
+    /**
+     * Muestra la fecha del sistema y propone el mes y año actuales.
+     */
+    private void mostrarFechaActual() {
+
+        LocalDate hoy = LocalDate.now();
+
+        DateTimeFormatter formato =
+                DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        txtFechaActual.setText(hoy.format(formato));
+
+        cmbGenerarMes.setSelectedIndex(hoy.getMonthValue());
+        txtAnio.setText(String.valueOf(hoy.getYear()));
+
+        jComboBox1.setSelectedIndex(hoy.getMonthValue());
+        txtAnioMensual.setText(String.valueOf(hoy.getYear()));
+    }
+
+    /**
+     * Llena el combo de filtro con los inquilinos registrados.
+     */
+    private void cargarInquilinosFiltro() {
+
+        cmbFiltroInquilino.removeAllItems();
+        cmbFiltroInquilino.addItem("Todos los Inquilinos");
+
+        ArrayList<Inquilino> lista =
+                InquilinoStore.getListaInquilinos();
+
+        for (int i = 0; i < lista.size(); i++) {
+            cmbFiltroInquilino.addItem(lista.get(i).getNomInqui());
+        }
     }
 
     /**
@@ -359,24 +424,218 @@ public class DlgMensualidades extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGenerarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarActionPerformed
-        // TODO add your handling code here:
+
+        // El combo trae "Todos" en la posición 0, entonces el
+        // índice coincide con el número del mes (1 = Enero).
+        int mes = cmbGenerarMes.getSelectedIndex();
+
+        if (mes == 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Seleccione el mes que desea generar.");
+            return;
+        }
+
+        int anio = leerAnio(txtAnio.getText());
+
+        if (anio == 0) {
+            return;
+        }
+
+        if (!MensualidadStore.periodoValido(mes, anio)) {
+
+            JOptionPane.showMessageDialog(this,
+                    "No se pueden generar recibos para una fecha "
+                    + "anterior al mes actual.");
+            return;
+        }
+
+        if (AlquilerStore.obtenerVigentes().isEmpty()) {
+
+            JOptionPane.showMessageDialog(this,
+                    "No hay alquileres vigentes para generar "
+                    + "mensualidades.");
+            return;
+        }
+
+        int generadas = MensualidadStore.generarMensualidades(mes, anio);
+
+        if (generadas > 0) {
+
+            JOptionPane.showMessageDialog(this,
+                    "Se generaron " + generadas + " mensualidades de "
+                    + nombresMeses[mes - 1] + " " + anio + ".");
+
+        } else {
+
+            JOptionPane.showMessageDialog(this,
+                    "No se generó ninguna mensualidad.\n"
+                    + "Las mensualidades de " + nombresMeses[mes - 1]
+                    + " " + anio + " ya fueron generadas o ningún "
+                    + "contrato está activo en ese mes.");
+        }
+
+        // Se muestran en la tabla las mensualidades de ese periodo
+        cargarTabla(MensualidadStore.buscarPorPeriodo(mes, anio));
     }//GEN-LAST:event_btnGenerarActionPerformed
 
     private void btnMostrarMensualidadesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarMensualidadesActionPerformed
-        // TODO add your handling code here:
+
+        int mes = jComboBox1.getSelectedIndex();
+
+        int anio = leerAnio(txtAnioMensual.getText());
+
+        if (anio == 0) {
+            return;
+        }
+
+        if (MensualidadStore.filtrar("", mes, anio).isEmpty()) {
+
+            JOptionPane.showMessageDialog(this,
+                    "No hay mensualidades registradas en ese periodo.");
+            return;
+        }
+
+        DlgMostrarMensualidades ventana =
+                new DlgMostrarMensualidades(
+                        (java.awt.Frame) getOwner(), true);
+
+        ventana.cargarPeriodo(mes, anio);
+        ventana.setLocationRelativeTo(this);
+        ventana.setVisible(true);
     }//GEN-LAST:event_btnMostrarMensualidadesActionPerformed
 
     private void btnFiltrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFiltrarActionPerformed
-        // TODO add your handling code here:
+
+        String inquilino = "";
+
+        if (cmbFiltroInquilino.getSelectedIndex() > 0) {
+            inquilino = cmbFiltroInquilino.getSelectedItem().toString();
+        }
+
+        int mes = cmbMes.getSelectedIndex();
+
+        int anio = 0;
+
+        if (!txtAnioMensualidad.getText().trim().equals("")) {
+
+            anio = leerAnio(txtAnioMensualidad.getText());
+
+            if (anio == 0) {
+                return;
+            }
+        }
+
+        ArrayList<Mensualidades> encontradas =
+                MensualidadStore.filtrar(inquilino, mes, anio);
+
+        if (encontradas.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "No se encontraron mensualidades con ese filtro.");
+        }
+
+        cargarTabla(encontradas);
     }//GEN-LAST:event_btnFiltrarActionPerformed
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
-        // TODO add your handling code here:
+
+        cmbFiltroInquilino.setSelectedIndex(0);
+        cmbMes.setSelectedIndex(0);
+        txtAnioMensualidad.setText("");
+
+        cargarTabla(MensualidadStore.getListaMensualidades());
     }//GEN-LAST:event_btnLimpiarActionPerformed
 
     private void btnCancelarMensuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarMensuActionPerformed
-        // TODO add your handling code here:
+        dispose();
     }//GEN-LAST:event_btnCancelarMensuActionPerformed
+
+    /**
+     * Convierte el texto del año a número y lo valida.
+     *
+     * @return el año digitado o 0 si el dato está malo
+     */
+    private int leerAnio(String texto) {
+
+        String valor = texto.trim();
+
+        if (valor.equals("")) {
+            JOptionPane.showMessageDialog(this,
+                    "Debe digitar el año.");
+            return 0;
+        }
+
+        try {
+
+            int anio = Integer.parseInt(valor);
+
+            if (anio < 1000 || anio > 9999) {
+                JOptionPane.showMessageDialog(this,
+                        "El año debe tener 4 dígitos. Ejemplo: 2026");
+                return 0;
+            }
+
+            return anio;
+
+        } catch (NumberFormatException error) {
+
+            JOptionPane.showMessageDialog(this,
+                    "El año solo puede tener números.");
+            return 0;
+        }
+    }
+
+    /**
+     * Pasa la lista de mensualidades recibida a la tabla.
+     */
+    private void cargarTabla(ArrayList<Mensualidades> lista) {
+
+        DefaultTableModel modelo =
+                (DefaultTableModel) tblMensualidades.getModel();
+
+        modelo.setRowCount(0);
+
+        for (int i = 0; i < lista.size(); i++) {
+
+            Mensualidades mensualidad = lista.get(i);
+
+            int numeroAlquiler = 0;
+
+            if (mensualidad.getAlquiler() != null) {
+                numeroAlquiler =
+                        mensualidad.getAlquiler().getNumAlquiler();
+            }
+
+            Object[] fila = new Object[9];
+            fila[0] = mensualidad.getConsecutivo();
+            fila[1] = numeroAlquiler;
+            fila[2] = formatearFecha(mensualidad.getFechCreacion());
+            fila[3] = mensualidad.getNomInquilino();
+            fila[4] = nombresMeses[mensualidad.getMesCobro() - 1];
+            fila[5] = mensualidad.getAnioActual();
+            fila[6] = mensualidad.getDescuento();
+            fila[7] = mensualidad.getMontoMes();
+            fila[8] = mensualidad.getEstado();
+
+            modelo.addRow(fila);
+        }
+
+        txtTotalRegistros.setText(String.valueOf(lista.size()));
+    }
+
+    /**
+     * Convierte una fecha al formato dd/MM/yyyy para mostrarla.
+     */
+    private String formatearFecha(LocalDate fecha) {
+
+        if (fecha == null) {
+            return "";
+        }
+
+        DateTimeFormatter formato =
+                DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        return fecha.format(formato);
+    }
 
     /**
      * @param args the command line arguments

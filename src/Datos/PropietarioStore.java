@@ -139,6 +139,36 @@ public class PropietarioStore {
     }
 
     /**
+     * Busca propietarios por nombre o por número de cédula.
+     *
+     * Sirve para la caja de búsqueda de la ventana de propietarios.
+     */
+    public static ArrayList<Propietario> buscarPorTexto(String texto) {
+
+        ArrayList<Propietario> resultado = new ArrayList<>();
+
+        if (texto == null) {
+            return resultado;
+        }
+
+        String busqueda = texto.trim().toLowerCase();
+
+        for (int i = 0; i < listaPropietarios.size(); i++) {
+
+            Propietario propietario = listaPropietarios.get(i);
+
+            String nombre = propietario.getNomPropiet().toLowerCase();
+            String cedula = String.valueOf(propietario.getCedPropiet());
+
+            if (nombre.contains(busqueda) || cedula.contains(busqueda)) {
+                resultado.add(propietario);
+            }
+        }
+
+        return resultado;
+    }
+
+    /**
      * Retorna la cantidad de propietarios registrados.
      */
     public static int cantidad() {

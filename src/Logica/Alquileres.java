@@ -2,6 +2,14 @@ package Logica;
 
 import java.time.LocalDate;
 
+/**
+ * Guarda los contratos de alquiler que se han realizado.
+ *
+ * El número de alquiler (numAlquiler) es consecutivo y único.
+ * El inquilino y la vivienda se guardan como objetos.
+ *
+ * Los estados que puede tener son: Vigente, Vencido y Cancelado.
+ */
 public class Alquileres {
 
     private int numAlquiler;

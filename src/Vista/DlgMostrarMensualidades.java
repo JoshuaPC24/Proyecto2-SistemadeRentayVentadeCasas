@@ -4,18 +4,117 @@
  */
 package Vista;
 
+import Datos.MensualidadStore;
+import Logica.Mensualidades;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import javax.swing.table.DefaultTableModel;
+
 /**
+ * Ventana que muestra las mensualidades de un mes y año.
+ *
+ * La ventana de mensualidades le envía el periodo con el método
+ * cargarPeriodo.
  *
  * @author mauri
  */
 public class DlgMostrarMensualidades extends javax.swing.JDialog {
 
     /**
+     * Nombres de los meses para mostrarlos en pantalla.
+     */
+    private final String[] nombresMeses = {
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Setiembre", "Octubre",
+        "Noviembre", "Diciembre"
+    };
+
+    /**
      * Creates new form DlgMostrarMensualidades
      */
     public DlgMostrarMensualidades(java.awt.Frame parent, boolean modal) {
+
         super(parent, modal);
         initComponents();
+
+        // La tabla viene con filas vacías desde el diseñador
+        DefaultTableModel modelo =
+                (DefaultTableModel) tblMensualidadesPeriodo.getModel();
+
+        modelo.setRowCount(0);
+    }
+
+    /**
+     * Carga en la tabla las mensualidades del mes y año recibidos.
+     *
+     * Si el mes viene en 0 se muestran todos los meses de ese año.
+     *
+     * @param mes número del mes (1 al 12) o 0 para todos
+     * @param anio año de 4 dígitos
+     */
+    public void cargarPeriodo(int mes, int anio) {
+
+        if (mes == 0) {
+            lblMes.setText("Todos");
+        } else {
+            lblMes.setText(nombresMeses[mes - 1]);
+        }
+
+        lblAnio.setText(String.valueOf(anio));
+
+        ArrayList<Mensualidades> lista =
+                MensualidadStore.filtrar("", mes, anio);
+
+        DefaultTableModel modelo =
+                (DefaultTableModel) tblMensualidadesPeriodo.getModel();
+
+        modelo.setRowCount(0);
+
+        double totalMonto = 0;
+
+        for (int i = 0; i < lista.size(); i++) {
+
+            Mensualidades mensualidad = lista.get(i);
+
+            int numeroAlquiler = 0;
+
+            if (mensualidad.getAlquiler() != null) {
+                numeroAlquiler =
+                        mensualidad.getAlquiler().getNumAlquiler();
+            }
+
+            Object[] fila = new Object[7];
+            fila[0] = mensualidad.getConsecutivo();
+            fila[1] = numeroAlquiler;
+            fila[2] = formatearFecha(mensualidad.getFechCreacion());
+            fila[3] = mensualidad.getNomInquilino();
+            fila[4] = mensualidad.getDescuento();
+            fila[5] = mensualidad.getMontoMes();
+            fila[6] = mensualidad.getEstado();
+
+            modelo.addRow(fila);
+
+            totalMonto = totalMonto + mensualidad.getMontoMes();
+        }
+
+        jLabel10.setText(String.valueOf(lista.size()));
+        jLabel12.setText(String.valueOf(totalMonto));
+    }
+
+    /**
+     * Convierte una fecha al formato dd/MM/yyyy para mostrarla.
+     */
+    private String formatearFecha(LocalDate fecha) {
+
+        if (fecha == null) {
+            return "";
+        }
+
+        DateTimeFormatter formato =
+                DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        return fecha.format(formato);
     }
 
     /**
@@ -223,7 +322,7 @@ public class DlgMostrarMensualidades extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarActionPerformed
-        // TODO add your handling code here:
+        dispose();
     }//GEN-LAST:event_btnCerrarActionPerformed
 
     /**

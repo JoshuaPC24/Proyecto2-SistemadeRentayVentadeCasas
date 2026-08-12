@@ -304,6 +304,28 @@ public class MensualidadStore {
     }
 
     /**
+     * Retorna todas las mensualidades de un alquiler.
+     */
+    public static ArrayList<Mensualidades> buscarPorAlquiler(
+            int numeroAlquiler) {
+
+        ArrayList<Mensualidades> resultado =
+                new ArrayList<>();
+
+        for (Mensualidades mensualidad : listaMensualidades) {
+
+            if (mensualidad.getAlquiler() != null
+                    && mensualidad.getAlquiler().getNumAlquiler()
+                    == numeroAlquiler) {
+
+                resultado.add(mensualidad);
+            }
+        }
+
+        return resultado;
+    }
+
+    /**
      * Busca mensualidades por nombre del inquilino.
      */
     public static ArrayList<Mensualidades> buscarPorInquilino(
@@ -326,6 +348,62 @@ public class MensualidadStore {
                             .toLowerCase()
                             .contains(textoBusqueda)) {
 
+                resultado.add(mensualidad);
+            }
+        }
+
+        return resultado;
+    }
+
+    /**
+     * Filtra las mensualidades por inquilino, mes y año al mismo tiempo.
+     *
+     * Si el nombre viene vacío no se filtra por inquilino, si el mes
+     * viene en 0 no se filtra por mes y si el año viene en 0 no se
+     * filtra por año.
+     */
+    public static ArrayList<Mensualidades> filtrar(
+            String nombreInquilino,
+            int mes,
+            int anio) {
+
+        ArrayList<Mensualidades> resultado =
+                new ArrayList<>();
+
+        String busqueda = "";
+
+        if (nombreInquilino != null) {
+            busqueda = nombreInquilino.trim().toLowerCase();
+        }
+
+        for (int i = 0; i < listaMensualidades.size(); i++) {
+
+            Mensualidades mensualidad = listaMensualidades.get(i);
+
+            boolean cumpleInquilino = true;
+            boolean cumpleMes = true;
+            boolean cumpleAnio = true;
+
+            if (!busqueda.equals("")) {
+
+                if (mensualidad.getNomInquilino() == null
+                        || !mensualidad.getNomInquilino()
+                                .toLowerCase()
+                                .contains(busqueda)) {
+
+                    cumpleInquilino = false;
+                }
+            }
+
+            if (mes != 0 && mensualidad.getMesCobro() != mes) {
+                cumpleMes = false;
+            }
+
+            if (anio != 0 && mensualidad.getAnioActual() != anio) {
+                cumpleAnio = false;
+            }
+
+            if (cumpleInquilino && cumpleMes && cumpleAnio) {
                 resultado.add(mensualidad);
             }
         }

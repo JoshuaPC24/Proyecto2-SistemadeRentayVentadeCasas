@@ -1,5 +1,13 @@
 package Logica;
 
+/**
+ * Guarda la información de las viviendas de la empresa.
+ *
+ * El id (idVivienda) es único y el dueño se guarda como un objeto
+ * de la clase Propietario (agregación).
+ *
+ * Los estados que puede tener son: Disponible, Alquilada e Inactiva.
+ */
 public class Vivienda {
 
     private int idVivienda;

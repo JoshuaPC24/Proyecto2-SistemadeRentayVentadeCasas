@@ -4,7 +4,18 @@
  */
 package Vista;
 
+import Datos.PropietarioStore;
+import Datos.ViviendaStore;
+import Logica.Propietario;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
+ * Ventana con el listado de propietarios.
+ *
+ * Permite buscar, agregar, editar y eliminar propietarios del
+ * ArrayList que se encuentra en PropietarioStore.
  *
  * @author mauri
  */
@@ -16,6 +27,7 @@ public class DlgPropietarios extends javax.swing.JDialog {
     public DlgPropietarios(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        cargarTabla();
     }
 
     /**
@@ -256,36 +268,160 @@ public class DlgPropietarios extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarActionPerformed
-        // TODO add your handling code here:
+
+        // Al presionar Enter en la caja se hace la misma búsqueda
+        // que con el botón Buscar.
+        btnBuscarActionPerformed(evt);
     }//GEN-LAST:event_txtBuscarActionPerformed
 
     private void txtPropietariosRegistradosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPropietariosRegistradosActionPerformed
-        // TODO add your handling code here:
+        // Este campo solo muestra el total, no necesita código.
     }//GEN-LAST:event_txtPropietariosRegistradosActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        // TODO add your handling code here:
+
+        String texto = txtBuscar.getText().trim();
+
+        if (texto.equals("")) {
+            cargarTabla();
+            return;
+        }
+
+        ArrayList<Propietario> encontrados =
+                PropietarioStore.buscarPorTexto(texto);
+
+        if (encontrados.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "No se encontró ningún propietario con ese dato.");
+        }
+
+        llenarTabla(encontrados);
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnMostrarTodoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarTodoActionPerformed
-        // TODO add your handling code here:
+        txtBuscar.setText("");
+        cargarTabla();
     }//GEN-LAST:event_btnMostrarTodoActionPerformed
 
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
-        // TODO add your handling code here:
+
+        DlgNuevoPropietario ventana = new DlgNuevoPropietario();
+        ventana.setVentanaListado(this);
+        ventana.setLocationRelativeTo(this);
+        ventana.setVisible(true);
     }//GEN-LAST:event_btnNuevoActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
-        // TODO add your handling code here:
+
+        int fila = tblPropietarios.getSelectedRow();
+
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this,
+                    "Seleccione en la tabla el propietario que desea editar.");
+            return;
+        }
+
+        int cedula = Integer.parseInt(
+                tblPropietarios.getValueAt(fila, 0).toString());
+
+        Propietario propietario = PropietarioStore.buscarPorCedula(cedula);
+
+        if (propietario == null) {
+            JOptionPane.showMessageDialog(this,
+                    "El propietario ya no existe en el sistema.");
+            cargarTabla();
+            return;
+        }
+
+        DlgNuevoPropietario ventana = new DlgNuevoPropietario();
+        ventana.setVentanaListado(this);
+        ventana.cargarPropietario(propietario);
+        ventana.setLocationRelativeTo(this);
+        ventana.setVisible(true);
     }//GEN-LAST:event_btnEditarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        // TODO add your handling code here:
+
+        int fila = tblPropietarios.getSelectedRow();
+
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this,
+                    "Seleccione en la tabla el propietario que desea eliminar.");
+            return;
+        }
+
+        int cedula = Integer.parseInt(
+                tblPropietarios.getValueAt(fila, 0).toString());
+
+        // Un propietario con viviendas registradas no se puede borrar
+        if (ViviendaStore.buscarPorPropietario(cedula).size() > 0) {
+
+            JOptionPane.showMessageDialog(this,
+                    "No se puede eliminar: el propietario tiene "
+                    + "viviendas registradas.");
+            return;
+        }
+
+        int respuesta = JOptionPane.showConfirmDialog(this,
+                "¿Seguro que desea eliminar este propietario?",
+                "Eliminar",
+                JOptionPane.YES_NO_OPTION);
+
+        if (respuesta == JOptionPane.YES_OPTION) {
+
+            if (PropietarioStore.eliminarPorCedula(cedula)) {
+
+                JOptionPane.showMessageDialog(this,
+                        "Propietario eliminado correctamente.");
+                cargarTabla();
+
+            } else {
+
+                JOptionPane.showMessageDialog(this,
+                        "No se pudo eliminar el propietario.");
+            }
+        }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarActionPerformed
-        // TODO add your handling code here:
+        dispose();
     }//GEN-LAST:event_btnCerrarActionPerformed
+
+    /**
+     * Muestra en la tabla todos los propietarios del ArrayList.
+     */
+    public void cargarTabla() {
+        llenarTabla(PropietarioStore.getListaPropietarios());
+    }
+
+    /**
+     * Pasa la lista de propietarios recibida a la tabla.
+     */
+    private void llenarTabla(ArrayList<Propietario> lista) {
+
+        DefaultTableModel modelo =
+                (DefaultTableModel) tblPropietarios.getModel();
+
+        modelo.setRowCount(0);
+
+        for (int i = 0; i < lista.size(); i++) {
+
+            Propietario propietario = lista.get(i);
+
+            Object[] fila = new Object[6];
+            fila[0] = propietario.getCedPropiet();
+            fila[1] = propietario.getNomPropiet();
+            fila[2] = propietario.getGenero();
+            fila[3] = propietario.getDireccion();
+            fila[4] = propietario.getTelefono();
+            fila[5] = propietario.getEmail();
+
+            modelo.addRow(fila);
+        }
+
+        txtPropietariosRegistrados.setText(
+                String.valueOf(PropietarioStore.cantidad()));
+    }
 
     /**
      * @param args the command line arguments

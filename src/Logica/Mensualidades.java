@@ -2,6 +2,14 @@ package Logica;
 
 import java.time.LocalDate;
 
+/**
+ * Guarda los recibos de cobro mensual de los alquileres vigentes.
+ *
+ * El consecutivo es único y solo puede existir una mensualidad
+ * por alquiler en cada mes y año.
+ *
+ * Los estados que puede tener son: Pendiente y Cancelado.
+ */
 public class Mensualidades {
 
     private int consecutivo;

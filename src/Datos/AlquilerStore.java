@@ -315,6 +315,89 @@ public class AlquilerStore {
     }
 
     /**
+     * Busca alquileres por número, nombre del inquilino o
+     * descripción de la vivienda.
+     *
+     * Sirve para la caja de búsqueda de la ventana de alquileres.
+     */
+    public static ArrayList<Alquileres> buscarPorTexto(String texto) {
+
+        ArrayList<Alquileres> resultado = new ArrayList<>();
+
+        if (texto == null) {
+            return resultado;
+        }
+
+        String busqueda = texto.trim().toLowerCase();
+
+        for (int i = 0; i < listaAlquileres.size(); i++) {
+
+            Alquileres alquiler = listaAlquileres.get(i);
+
+            String numero = String.valueOf(alquiler.getNumAlquiler());
+
+            String inquilino = "";
+            if (alquiler.getInquilino() != null) {
+                inquilino = alquiler.getInquilino()
+                        .getNomInqui().toLowerCase();
+            }
+
+            String vivienda = "";
+            if (alquiler.getVivienda() != null) {
+                vivienda = alquiler.getVivienda()
+                        .getDescripcion().toLowerCase();
+            }
+
+            if (numero.contains(busqueda)
+                    || inquilino.contains(busqueda)
+                    || vivienda.contains(busqueda)) {
+
+                resultado.add(alquiler);
+            }
+        }
+
+        return resultado;
+    }
+
+    /**
+     * Verifica si un inquilino tiene algún alquiler registrado.
+     *
+     * Se usa para no borrar inquilinos que ya están en un contrato.
+     */
+    public static boolean inquilinoTieneAlquiler(int cedulaInquilino) {
+
+        for (Alquileres alquiler : listaAlquileres) {
+
+            if (alquiler.getInquilino() != null
+                    && alquiler.getInquilino().getCedInqui()
+                    == cedulaInquilino) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Verifica si una vivienda tiene algún alquiler registrado.
+     */
+    public static boolean viviendaTieneAlquiler(int idVivienda) {
+
+        for (Alquileres alquiler : listaAlquileres) {
+
+            if (alquiler.getVivienda() != null
+                    && alquiler.getVivienda().getIdVivienda()
+                    == idVivienda) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Retorna la cantidad de alquileres registrados.
      */
     public static int cantidad() {

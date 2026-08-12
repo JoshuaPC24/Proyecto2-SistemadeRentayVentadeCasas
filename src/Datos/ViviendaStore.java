@@ -192,6 +192,40 @@ public class ViviendaStore {
     }
 
     /**
+     * Busca viviendas por id, descripción o dirección.
+     *
+     * Sirve para la caja de búsqueda de la ventana de viviendas.
+     */
+    public static ArrayList<Vivienda> buscarPorTexto(String texto) {
+
+        ArrayList<Vivienda> resultado = new ArrayList<>();
+
+        if (texto == null) {
+            return resultado;
+        }
+
+        String busqueda = texto.trim().toLowerCase();
+
+        for (int i = 0; i < listaViviendas.size(); i++) {
+
+            Vivienda vivienda = listaViviendas.get(i);
+
+            String id = String.valueOf(vivienda.getIdVivienda());
+            String descripcion = vivienda.getDescripcion().toLowerCase();
+            String direccion = vivienda.getDireccion().toLowerCase();
+
+            if (id.contains(busqueda)
+                    || descripcion.contains(busqueda)
+                    || direccion.contains(busqueda)) {
+
+                resultado.add(vivienda);
+            }
+        }
+
+        return resultado;
+    }
+
+    /**
      * Retorna la cantidad de viviendas registradas.
      */
     public static int cantidad() {

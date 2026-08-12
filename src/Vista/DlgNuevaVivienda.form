@@ -487,10 +487,13 @@
                 <StringItem index="0" value="Seleccione"/>
                 <StringItem index="1" value="Disponible"/>
                 <StringItem index="2" value="Alquilada"/>
-                <StringItem index="3" value="Activa"/>
+                <StringItem index="3" value="Inactiva"/>
               </StringArray>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmbEstadoActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
