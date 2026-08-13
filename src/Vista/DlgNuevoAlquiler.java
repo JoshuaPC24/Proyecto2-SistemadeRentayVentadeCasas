@@ -240,8 +240,8 @@ public class DlgNuevoAlquiler extends javax.swing.JDialog {
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel3.setText("Cantidad de Meses:");
 
+        jLabel4.setText("Número de niños:");
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel4.setText("Metros de niños:");
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel5.setText("Deposito de Garantia:");
