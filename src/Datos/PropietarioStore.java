@@ -3,182 +3,57 @@ package Datos;
 import Logica.Propietario;
 import java.util.ArrayList;
 
+/**
+ *
+ * @author mauri
+ */
 public class PropietarioStore {
 
-    private static final ArrayList<Propietario> listaPropietarios
-            = new ArrayList<>();
+    private ArrayList<Propietario> listaPropietarios;
 
-    /**
-     * Retorna todos los propietarios registrados.
-     */
-    public static ArrayList<Propietario> getListaPropietarios() {
+    public PropietarioStore() {
+        this.listaPropietarios = new ArrayList();
+    }
+
+    public ArrayList<Propietario> getListaPropietarios() {
         return listaPropietarios;
     }
 
-    /**
-     * Inserta un propietario si la cédula no está registrada.
-     */
-    public static boolean insertar(Propietario propietario) {
-
-        if (propietario == null) {
-            return false;
-        }
-
-        if (cedulaExiste(propietario.getCedPropiet(), -1)) {
-            return false;
-        }
-
-        listaPropietarios.add(propietario);
-        return true;
+    public void setListaPropietarios(ArrayList<Propietario> listaPropietarios) {
+        this.listaPropietarios = listaPropietarios;
     }
 
-    /**
-     * Busca un propietario por número de cédula.
-     */
-    public static Propietario buscarPorCedula(int cedula) {
+    //Métodos del CRUD
+    public void insertarPropietario(Propietario propietario) {
+        if (this.listaPropietarios != null) {
+            this.listaPropietarios.add(propietario);
+        }
+    }
 
-        for (Propietario propietario : listaPropietarios) {
+    public void editarPropietario(int index, Propietario nuevo) {
+        if (index >= 0 && nuevo != null && !listaPropietarios.isEmpty()) {
+            this.listaPropietarios.set(index, nuevo);
+        }
+    }
 
-            if (propietario.getCedPropiet() == cedula) {
-                return propietario;
+    public boolean eliminarPropietario(Propietario propietario) {
+        if (this.listaPropietarios.contains(propietario)) {
+            this.listaPropietarios.remove(propietario);
+            return true;
+        }
+        return false;  // El propietario no existe en el ArrayList
+    }
+
+    public Propietario buscarCedula(int cedula) {
+        for (Propietario p : listaPropietarios) {
+            if (p.getCedPropiet() == cedula) {
+                return p;
             }
         }
-
         return null;
     }
 
-    /**
-     * Retorna la posición de un propietario dentro del ArrayList.
-     */
-    public static int buscarIndice(int cedula) {
-
-        for (int i = 0; i < listaPropietarios.size(); i++) {
-
-            if (listaPropietarios.get(i).getCedPropiet() == cedula) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    /**
-     * Modifica un propietario existente.
-     */
-    public static boolean modificar(
-            int indice,
-            Propietario propietarioModificado) {
-
-        if (propietarioModificado == null) {
-            return false;
-        }
-
-        if (indice < 0 || indice >= listaPropietarios.size()) {
-            return false;
-        }
-
-        if (cedulaExiste(
-                propietarioModificado.getCedPropiet(),
-                indice)) {
-
-            return false;
-        }
-
-        listaPropietarios.set(indice, propietarioModificado);
-        return true;
-    }
-
-    /**
-     * Elimina un propietario según su índice.
-     */
-    public static boolean eliminar(int indice) {
-
-        if (indice < 0 || indice >= listaPropietarios.size()) {
-            return false;
-        }
-
-        listaPropietarios.remove(indice);
-        return true;
-    }
-
-    /**
-     * Elimina un propietario utilizando su cédula.
-     */
-    public static boolean eliminarPorCedula(int cedula) {
-
-        int indice = buscarIndice(cedula);
-
-        if (indice == -1) {
-            return false;
-        }
-
-        listaPropietarios.remove(indice);
-        return true;
-    }
-
-    /**
-     * Verifica si una cédula ya está registrada.
-     *
-     * El índice ignorado se utiliza al modificar un registro.
-     */
-    public static boolean cedulaExiste(
-            int cedula,
-            int indiceIgnorado) {
-
-        for (int i = 0; i < listaPropietarios.size(); i++) {
-
-            if (i != indiceIgnorado
-                    && listaPropietarios.get(i).getCedPropiet()
-                    == cedula) {
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Busca propietarios por nombre o por número de cédula.
-     *
-     * Sirve para la caja de búsqueda de la ventana de propietarios.
-     */
-    public static ArrayList<Propietario> buscarPorTexto(String texto) {
-
-        ArrayList<Propietario> resultado = new ArrayList<>();
-
-        if (texto == null) {
-            return resultado;
-        }
-
-        String busqueda = texto.trim().toLowerCase();
-
-        for (int i = 0; i < listaPropietarios.size(); i++) {
-
-            Propietario propietario = listaPropietarios.get(i);
-
-            String nombre = propietario.getNomPropiet().toLowerCase();
-            String cedula = String.valueOf(propietario.getCedPropiet());
-
-            if (nombre.contains(busqueda) || cedula.contains(busqueda)) {
-                resultado.add(propietario);
-            }
-        }
-
-        return resultado;
-    }
-
-    /**
-     * Retorna la cantidad de propietarios registrados.
-     */
-    public static int cantidad() {
+    public int cantidad() {
         return listaPropietarios.size();
-    }
-
-    /**
-     * Verifica si el ArrayList está vacío.
-     */
-    public static boolean estaVacio() {
-        return listaPropietarios.isEmpty();
     }
 }

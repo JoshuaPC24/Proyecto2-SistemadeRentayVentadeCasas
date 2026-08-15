@@ -10,35 +10,37 @@ import java.time.LocalDate;
 import javax.swing.JOptionPane;
 
 /**
- * Ventana para registrar un inquilino nuevo o para editar uno
- * que ya existe en el ArrayList de inquilinos.
  *
  * @author mauri
  */
 public class DlgNuevoInquilino extends javax.swing.JDialog {
 
-    /**
-     * Inquilino que se está editando.
-     * Si vale null quiere decir que se está registrando uno nuevo.
-     */
-    private Inquilino inquilinoEditar = null;
+    InquilinoStore listaInquilinos;
+    Inquilino inquilino;
+    int pos;
 
     /**
      * Creates new form DlgNuevoInquilino
      */
-    public DlgNuevoInquilino(java.awt.Frame parent, boolean modal) {
+    public DlgNuevoInquilino(java.awt.Frame parent, boolean modal,
+            InquilinoStore listaInquilinos) {
         super(parent, modal);
         initComponents();
+        this.listaInquilinos = listaInquilinos;
     }
 
-    /**
-     * Carga en pantalla los datos de un inquilino para editarlo.
-     */
-    public void cargarInquilino(Inquilino inquilino) {
+    public DlgNuevoInquilino(java.awt.Frame parent, boolean modal,
+            InquilinoStore listaInquilinos, Inquilino inquilino, int pos) {
 
-        this.inquilinoEditar = inquilino;
+        super(parent, modal);
+        initComponents();
+        this.listaInquilinos = listaInquilinos;
+        this.inquilino = inquilino;
+        this.pos = pos;
 
+        setTitle("Editar Inquilino");
         txtCedula.setText(String.valueOf(inquilino.getCedInqui()));
+        txtCedula.setEnabled(false);
         txtNombre.setText(inquilino.getNomInqui());
         cmbGenero.setSelectedItem(inquilino.getGenero());
         datePicker1.setDate(inquilino.getFechNac());
@@ -284,47 +286,32 @@ public class DlgNuevoInquilino extends javax.swing.JDialog {
         String correo = txtCorreo.getText().trim();
         String ocupacion = txtOcupacion.getText().trim();
 
-        if (inquilinoEditar == null) {
+        Inquilino nuevo = new Inquilino(
+                cedula, nombre, genero, fechaNacimiento,
+                direccion, telefono, correo, ocupacion);
 
-            // Registro nuevo
-            Inquilino nuevo = new Inquilino(
-                    cedula, nombre, genero, fechaNacimiento,
-                    direccion, telefono, correo, ocupacion);
+        if (inquilino == null) {
 
-            if (InquilinoStore.insertar(nuevo)) {
+            //Registro nuevo
+            if (listaInquilinos.buscarCedula(cedula) == null) {
 
+                listaInquilinos.insertarInquilino(nuevo);
                 JOptionPane.showMessageDialog(this,
                         "Inquilino registrado correctamente.");
                 dispose();
 
             } else {
-
                 JOptionPane.showMessageDialog(this,
                         "Ya existe un inquilino con esa cédula.");
             }
 
         } else {
 
-            // Modificación de un inquilino existente
-            int indice = InquilinoStore.buscarIndice(
-                    inquilinoEditar.getCedInqui());
-
-            Inquilino modificado = new Inquilino(
-                    cedula, nombre, genero, fechaNacimiento,
-                    direccion, telefono, correo, ocupacion);
-
-            if (InquilinoStore.modificar(indice, modificado)) {
-
-                JOptionPane.showMessageDialog(this,
-                        "Inquilino modificado correctamente.");
-                dispose();
-
-            } else {
-
-                JOptionPane.showMessageDialog(this,
-                        "No se pudo modificar. "
-                        + "Ya existe otro inquilino con esa cédula.");
-            }
+            //Modificación de un inquilino existente
+            listaInquilinos.editarInquilino(pos, nuevo);
+            JOptionPane.showMessageDialog(this,
+                    "Inquilino modificado correctamente.");
+            dispose();
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
@@ -332,56 +319,25 @@ public class DlgNuevoInquilino extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
-    /**
-     * Revisa que todos los datos digitados sean correctos.
-     *
-     * @return true si todo está bien, false si hay algún error
-     */
+    //Validación de campos vacíos y datos numéricos
     private boolean validarCampos() {
 
-        String cedula = txtCedula.getText().trim();
-        String nombre = txtNombre.getText().trim();
-        String direccion = txtDireccion.getText().trim();
-        String telefono = txtTelefono.getText().trim();
-        String correo = txtCorreo.getText().trim();
-        String ocupacion = txtOcupacion.getText().trim();
+        if (txtCedula.getText().isBlank()
+                || txtNombre.getText().isBlank()
+                || cmbGenero.getSelectedIndex() == 0
+                || txtDireccion.getText().isBlank()
+                || txtTelefono.getText().isBlank()
+                || txtCorreo.getText().isBlank()
+                || txtOcupacion.getText().isBlank()) {
 
-        if (cedula.equals("")) {
-            JOptionPane.showMessageDialog(this,
-                    "Debe digitar la cédula del inquilino.");
-            txtCedula.requestFocus();
+            JOptionPane.showMessageDialog(this, "Hay campos vacíos");
             return false;
         }
 
         try {
-
-            int numeroCedula = Integer.parseInt(cedula);
-
-            if (numeroCedula <= 0) {
-                JOptionPane.showMessageDialog(this,
-                        "La cédula debe ser un número mayor que cero.");
-                txtCedula.requestFocus();
-                return false;
-            }
-
-        } catch (NumberFormatException error) {
-
-            JOptionPane.showMessageDialog(this,
-                    "La cédula solo puede tener números.");
-            txtCedula.requestFocus();
-            return false;
-        }
-
-        if (nombre.equals("")) {
-            JOptionPane.showMessageDialog(this,
-                    "Debe digitar el nombre del inquilino.");
-            txtNombre.requestFocus();
-            return false;
-        }
-
-        if (cmbGenero.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(this,
-                    "Debe seleccionar el género.");
+            Integer.parseInt(txtCedula.getText().trim());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "La cédula debe ser numérica");
             return false;
         }
 
@@ -393,85 +349,25 @@ public class DlgNuevoInquilino extends javax.swing.JDialog {
             return false;
         }
 
-        if (fechaNacimiento.isAfter(LocalDate.now())) {
-            JOptionPane.showMessageDialog(this,
-                    "La fecha de nacimiento no puede ser futura.");
-            return false;
-        }
-
         if (fechaNacimiento.isAfter(LocalDate.now().minusYears(18))) {
             JOptionPane.showMessageDialog(this,
                     "El inquilino debe ser mayor de edad.");
             return false;
         }
 
-        if (direccion.equals("")) {
-            JOptionPane.showMessageDialog(this,
-                    "Debe digitar la dirección.");
-            txtDireccion.requestFocus();
-            return false;
-        }
-
-        if (!telefonoValido(telefono)) {
+        if (txtTelefono.getText().trim().length() != 8) {
             JOptionPane.showMessageDialog(this,
                     "El teléfono debe tener 8 números. Ejemplo: 88887777");
-            txtTelefono.requestFocus();
             return false;
         }
 
-        if (!correoValido(correo)) {
+        if (!txtCorreo.getText().contains("@")) {
             JOptionPane.showMessageDialog(this,
                     "Digite un correo válido. Ejemplo: nombre@correo.com");
-            txtCorreo.requestFocus();
-            return false;
-        }
-
-        if (ocupacion.equals("")) {
-            JOptionPane.showMessageDialog(this,
-                    "Debe digitar la ocupación del inquilino.");
-            txtOcupacion.requestFocus();
             return false;
         }
 
         return true;
-    }
-
-    /**
-     * Revisa que el teléfono tenga 8 dígitos.
-     */
-    private boolean telefonoValido(String telefono) {
-
-        String soloNumeros = telefono.replace("-", "").replace(" ", "");
-
-        if (soloNumeros.length() != 8) {
-            return false;
-        }
-
-        for (int i = 0; i < soloNumeros.length(); i++) {
-
-            if (!Character.isDigit(soloNumeros.charAt(i))) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Revisa que el correo tenga arroba y punto.
-     */
-    private boolean correoValido(String correo) {
-
-        if (correo.equals("")) {
-            return false;
-        }
-
-        int posicionArroba = correo.indexOf("@");
-        int posicionPunto = correo.lastIndexOf(".");
-
-        return posicionArroba > 0
-                && posicionPunto > posicionArroba + 1
-                && posicionPunto < correo.length() - 1;
     }
 
     /**
@@ -504,7 +400,8 @@ public class DlgNuevoInquilino extends javax.swing.JDialog {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                DlgNuevoInquilino dialog = new DlgNuevoInquilino(new javax.swing.JFrame(), true);
+                DlgNuevoInquilino dialog = new DlgNuevoInquilino(new javax.swing.JFrame(), true,
+                        new InquilinoStore());
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

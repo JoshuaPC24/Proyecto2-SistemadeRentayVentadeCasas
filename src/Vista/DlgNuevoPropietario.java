@@ -9,52 +9,39 @@ import Logica.Propietario;
 import javax.swing.JOptionPane;
 
 /**
- * Ventana para registrar un propietario nuevo o para editar uno
- * que ya existe en el ArrayList de propietarios.
  *
  * @author mauri
  */
 public class DlgNuevoPropietario extends javax.swing.JFrame {
 
-    /**
-     * Propietario que se está editando.
-     * Si vale null quiere decir que se está registrando uno nuevo.
-     */
-    private Propietario propietarioEditar = null;
-
-    /**
-     * Ventana del listado, para poder refrescar la tabla al guardar.
-     */
-    private DlgPropietarios ventanaListado = null;
+    PropietarioStore listaPropietarios;
+    Propietario propietario;
+    int pos;
 
     /**
      * Creates new form DlgNuevoPropietario
      */
-    public DlgNuevoPropietario() {
+    public DlgNuevoPropietario(PropietarioStore listaPropietarios) {
 
         initComponents();
-
-        // Esta ventana es un JFrame, si se cierra con la X no debe
-        // cerrar todo el sistema, solamente esta ventana.
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+        this.listaPropietarios = listaPropietarios;
     }
 
-    /**
-     * Guarda la ventana del listado para refrescar la tabla al guardar.
-     */
-    public void setVentanaListado(DlgPropietarios ventanaListado) {
-        this.ventanaListado = ventanaListado;
-    }
+    public DlgNuevoPropietario(PropietarioStore listaPropietarios,
+            Propietario propietario, int pos) {
 
-    /**
-     * Carga en pantalla los datos de un propietario para editarlo.
-     */
-    public void cargarPropietario(Propietario propietario) {
+        initComponents();
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+        this.listaPropietarios = listaPropietarios;
+        this.propietario = propietario;
+        this.pos = pos;
 
-        this.propietarioEditar = propietario;
-
+        setTitle("Editar Propietario");
         txtCedula.setText(String.valueOf(propietario.getCedPropiet()));
+        txtCedula.setEnabled(false);
         txtNombre.setText(propietario.getNomPropiet());
         cmbGenero.setSelectedItem(propietario.getGenero());
         txtDireccion.setText(propietario.getDireccion());
@@ -268,57 +255,31 @@ public class DlgNuevoPropietario extends javax.swing.JFrame {
         String telefono = txtTelefono.getText().trim();
         String correo = txtCorreo.getText().trim();
 
-        if (propietarioEditar == null) {
+        Propietario nuevo = new Propietario(
+                cedula, nombre, genero, direccion, telefono, correo);
 
-            // Registro nuevo
-            Propietario nuevo = new Propietario(
-                    cedula, nombre, genero, direccion, telefono, correo);
+        if (propietario == null) {
 
-            if (PropietarioStore.insertar(nuevo)) {
+            //Registro nuevo
+            if (listaPropietarios.buscarCedula(cedula) == null) {
 
+                listaPropietarios.insertarPropietario(nuevo);
                 JOptionPane.showMessageDialog(this,
                         "Propietario registrado correctamente.");
-
-                // Se refresca la tabla de la ventana del listado
-                if (ventanaListado != null) {
-                    ventanaListado.cargarTabla();
-                }
-
                 dispose();
 
             } else {
-
                 JOptionPane.showMessageDialog(this,
                         "Ya existe un propietario con esa cédula.");
             }
 
         } else {
 
-            // Modificación de un propietario existente
-            int indice = PropietarioStore.buscarIndice(
-                    propietarioEditar.getCedPropiet());
-
-            Propietario modificado = new Propietario(
-                    cedula, nombre, genero, direccion, telefono, correo);
-
-            if (PropietarioStore.modificar(indice, modificado)) {
-
-                JOptionPane.showMessageDialog(this,
-                        "Propietario modificado correctamente.");
-
-                // Se refresca la tabla de la ventana del listado
-                if (ventanaListado != null) {
-                    ventanaListado.cargarTabla();
-                }
-
-                dispose();
-
-            } else {
-
-                JOptionPane.showMessageDialog(this,
-                        "No se pudo modificar. "
-                        + "Ya existe otro propietario con esa cédula.");
-            }
+            //Modificación de un propietario existente
+            listaPropietarios.editarPropietario(pos, nuevo);
+            JOptionPane.showMessageDialog(this,
+                    "Propietario modificado correctamente.");
+            dispose();
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
@@ -326,119 +287,40 @@ public class DlgNuevoPropietario extends javax.swing.JFrame {
         dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
-    /**
-     * Revisa que todos los datos digitados sean correctos.
-     *
-     * @return true si todo está bien, false si hay algún error
-     */
+    //Validación de campos vacíos y datos numéricos
     private boolean validarCampos() {
 
-        String cedula = txtCedula.getText().trim();
-        String nombre = txtNombre.getText().trim();
-        String direccion = txtDireccion.getText().trim();
-        String telefono = txtTelefono.getText().trim();
-        String correo = txtCorreo.getText().trim();
+        if (txtCedula.getText().isBlank()
+                || txtNombre.getText().isBlank()
+                || cmbGenero.getSelectedIndex() == 0
+                || txtDireccion.getText().isBlank()
+                || txtTelefono.getText().isBlank()
+                || txtCorreo.getText().isBlank()) {
 
-        if (cedula.equals("")) {
-            JOptionPane.showMessageDialog(this,
-                    "Debe digitar la cédula del propietario.");
-            txtCedula.requestFocus();
+            JOptionPane.showMessageDialog(this, "Hay campos vacíos");
             return false;
         }
 
         try {
-
-            int numeroCedula = Integer.parseInt(cedula);
-
-            if (numeroCedula <= 0) {
-                JOptionPane.showMessageDialog(this,
-                        "La cédula debe ser un número mayor que cero.");
-                txtCedula.requestFocus();
-                return false;
-            }
-
-        } catch (NumberFormatException error) {
-
-            JOptionPane.showMessageDialog(this,
-                    "La cédula solo puede tener números.");
-            txtCedula.requestFocus();
+            Integer.parseInt(txtCedula.getText().trim());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "La cédula debe ser numérica");
             return false;
         }
 
-        if (nombre.equals("")) {
-            JOptionPane.showMessageDialog(this,
-                    "Debe digitar el nombre del propietario.");
-            txtNombre.requestFocus();
-            return false;
-        }
-
-        if (cmbGenero.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(this,
-                    "Debe seleccionar el género.");
-            return false;
-        }
-
-        if (direccion.equals("")) {
-            JOptionPane.showMessageDialog(this,
-                    "Debe digitar la dirección.");
-            txtDireccion.requestFocus();
-            return false;
-        }
-
-        if (!telefonoValido(telefono)) {
+        if (txtTelefono.getText().trim().length() != 8) {
             JOptionPane.showMessageDialog(this,
                     "El teléfono debe tener 8 números. Ejemplo: 88887777");
-            txtTelefono.requestFocus();
             return false;
         }
 
-        if (!correoValido(correo)) {
+        if (!txtCorreo.getText().contains("@")) {
             JOptionPane.showMessageDialog(this,
                     "Digite un correo válido. Ejemplo: nombre@correo.com");
-            txtCorreo.requestFocus();
             return false;
         }
 
         return true;
-    }
-
-    /**
-     * Revisa que el teléfono tenga 8 dígitos.
-     */
-    private boolean telefonoValido(String telefono) {
-
-        // Se quitan los guiones y espacios por si el usuario los digita
-        String soloNumeros = telefono.replace("-", "").replace(" ", "");
-
-        if (soloNumeros.length() != 8) {
-            return false;
-        }
-
-        for (int i = 0; i < soloNumeros.length(); i++) {
-
-            if (!Character.isDigit(soloNumeros.charAt(i))) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Revisa que el correo tenga arroba y punto.
-     */
-    private boolean correoValido(String correo) {
-
-        if (correo.equals("")) {
-            return false;
-        }
-
-        int posicionArroba = correo.indexOf("@");
-        int posicionPunto = correo.lastIndexOf(".");
-
-        return posicionArroba > 0
-                && posicionPunto > posicionArroba + 1
-                && posicionPunto < correo.length() - 1;
     }
 
     /**
@@ -471,7 +353,7 @@ public class DlgNuevoPropietario extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new DlgNuevoPropietario().setVisible(true);
+                new DlgNuevoPropietario(new PropietarioStore()).setVisible(true);
             }
         });
     }

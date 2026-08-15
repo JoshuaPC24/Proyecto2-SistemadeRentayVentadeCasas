@@ -14,58 +14,25 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * Ventana con el listado de inquilinos.
- *
- * Permite buscar, agregar, editar y eliminar inquilinos del
- * ArrayList que se encuentra en InquilinoStore.
  *
  * @author mauri
  */
 public class DlgInquilinos extends javax.swing.JDialog {
 
+    InquilinoStore listaInquilinos;
+    AlquilerStore listaAlquileres;
+
     /**
      * Creates new form DlgInquilinos
      */
-    public DlgInquilinos(java.awt.Frame parent, boolean modal) {
+    public DlgInquilinos(java.awt.Frame parent, boolean modal,
+            InquilinoStore listaInquilinos, AlquilerStore listaAlquileres) {
 
         super(parent, modal);
         initComponents();
 
-        // Estos botones no tienen evento creado en el diseñador,
-        // por eso aquí se les conecta su código.
-        conectarBotones();
-
-        cargarTabla();
-    }
-
-    /**
-     * Conecta los botones Nuevo, Editar, Eliminar y Cerrar con su evento.
-     */
-    private void conectarBotones() {
-
-        btnNuevo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNuevoActionPerformed(evt);
-            }
-        });
-
-        btnEditar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditarActionPerformed(evt);
-            }
-        });
-
-        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEliminarActionPerformed(evt);
-            }
-        });
-
-        btnCerrar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCerrarActionPerformed(evt);
-            }
-        });
+        this.listaInquilinos = listaInquilinos;
+        this.listaAlquileres = listaAlquileres;
     }
 
     /**
@@ -97,6 +64,11 @@ public class DlgInquilinos extends javax.swing.JDialog {
         jLabel6 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+        });
 
         jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
@@ -106,6 +78,11 @@ public class DlgInquilinos extends javax.swing.JDialog {
         txtBuscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtBuscarActionPerformed(evt);
+            }
+        });
+        txtBuscar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtBuscarKeyReleased(evt);
             }
         });
 
@@ -149,15 +126,35 @@ public class DlgInquilinos extends javax.swing.JDialog {
 
         btnNuevo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Agregar.png"))); // NOI18N
         btnNuevo.setText("Nuevo");
+        btnNuevo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNuevoActionPerformed(evt);
+            }
+        });
 
         btnEditar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Editar.png"))); // NOI18N
         btnEditar.setText("Editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
 
         btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Eliminar.png"))); // NOI18N
         btnEliminar.setText("Eliminar");
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
 
         btnCerrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/cerrar.png"))); // NOI18N
         btnCerrar.setText("Cerrar");
+        btnCerrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCerrarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -296,15 +293,21 @@ public class DlgInquilinos extends javax.swing.JDialog {
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
 
-        String texto = txtBuscar.getText().trim();
+        String texto = txtBuscar.getText().trim().toLowerCase();
 
         if (texto.equals("")) {
             cargarTabla();
             return;
         }
 
-        ArrayList<Inquilino> encontrados =
-                InquilinoStore.buscarPorTexto(texto);
+        ArrayList<Inquilino> encontrados = new ArrayList();
+
+        for (Inquilino i : listaInquilinos.getListaInquilinos()) {
+            if (String.valueOf(i.getCedInqui()).contains(texto)
+                    || i.getNomInqui().toLowerCase().contains(texto)) {
+                encontrados.add(i);
+            }
+        }
 
         if (encontrados.isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -319,106 +322,97 @@ public class DlgInquilinos extends javax.swing.JDialog {
         cargarTabla();
     }//GEN-LAST:event_btnMostrarTodoActionPerformed
 
-    private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {
+    private void txtBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarKeyReleased
+        btnBuscarActionPerformed(null);
+    }//GEN-LAST:event_txtBuscarKeyReleased
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        cargarTabla();
+    }//GEN-LAST:event_formWindowActivated
+
+    private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
 
         DlgNuevoInquilino ventana =
-                new DlgNuevoInquilino((java.awt.Frame) getOwner(), true);
+                new DlgNuevoInquilino((java.awt.Frame) getOwner(), true, listaInquilinos);
 
         ventana.setLocationRelativeTo(this);
         ventana.setVisible(true);
+    }//GEN-LAST:event_btnNuevoActionPerformed
 
-        cargarTabla();
-    }
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
 
-    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {
+        if (tblInquilinos.getSelectedRowCount() == 1) {
 
-        int fila = tblInquilinos.getSelectedRow();
+            int fila = tblInquilinos.getSelectedRow();
 
-        if (fila == -1) {
+            int cedula = Integer.parseInt(
+                    tblInquilinos.getValueAt(fila, 0).toString());
+
+            Inquilino inquilino = listaInquilinos.buscarCedula(cedula);
+            int pos = listaInquilinos.getListaInquilinos().indexOf(inquilino);
+
+            DlgNuevoInquilino ventana = new DlgNuevoInquilino(
+                    (java.awt.Frame) getOwner(), true,
+                    listaInquilinos, inquilino, pos);
+
+            ventana.setLocationRelativeTo(this);
+            ventana.setVisible(true);
+
+        } else {
             JOptionPane.showMessageDialog(this,
-                    "Seleccione en la tabla el inquilino que desea editar.");
-            return;
+                    "Debe seleccionar 1 Inquilino");
         }
+    }//GEN-LAST:event_btnEditarActionPerformed
 
-        int cedula = Integer.parseInt(
-                tblInquilinos.getValueAt(fila, 0).toString());
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
 
-        Inquilino inquilino = InquilinoStore.buscarPorCedula(cedula);
+        if (tblInquilinos.getSelectedRowCount() == 1) {
 
-        if (inquilino == null) {
-            JOptionPane.showMessageDialog(this,
-                    "El inquilino ya no existe en el sistema.");
-            cargarTabla();
-            return;
-        }
+            int fila = tblInquilinos.getSelectedRow();
 
-        DlgNuevoInquilino ventana =
-                new DlgNuevoInquilino((java.awt.Frame) getOwner(), true);
+            int cedula = Integer.parseInt(
+                    tblInquilinos.getValueAt(fila, 0).toString());
 
-        ventana.cargarInquilino(inquilino);
-        ventana.setLocationRelativeTo(this);
-        ventana.setVisible(true);
+            // Un inquilino con alquileres registrados no se puede borrar
+            if (listaAlquileres.inquilinoTieneAlquiler(cedula)) {
 
-        cargarTabla();
-    }
+                JOptionPane.showMessageDialog(this,
+                        "No se puede eliminar: el inquilino tiene "
+                        + "alquileres registrados.");
+                return;
+            }
 
-    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {
+            int respuesta = JOptionPane.showConfirmDialog(this,
+                    "¿Seguro que desea eliminar este inquilino?",
+                    "Eliminar",
+                    JOptionPane.YES_NO_OPTION);
 
-        int fila = tblInquilinos.getSelectedRow();
+            if (respuesta == JOptionPane.YES_OPTION) {
 
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(this,
-                    "Seleccione en la tabla el inquilino que desea eliminar.");
-            return;
-        }
-
-        int cedula = Integer.parseInt(
-                tblInquilinos.getValueAt(fila, 0).toString());
-
-        // Un inquilino con alquileres registrados no se puede borrar
-        if (AlquilerStore.inquilinoTieneAlquiler(cedula)) {
-
-            JOptionPane.showMessageDialog(this,
-                    "No se puede eliminar: el inquilino tiene "
-                    + "alquileres registrados.");
-            return;
-        }
-
-        int respuesta = JOptionPane.showConfirmDialog(this,
-                "¿Seguro que desea eliminar este inquilino?",
-                "Eliminar",
-                JOptionPane.YES_NO_OPTION);
-
-        if (respuesta == JOptionPane.YES_OPTION) {
-
-            if (InquilinoStore.eliminarPorCedula(cedula)) {
+                Inquilino inquilino = listaInquilinos.buscarCedula(cedula);
+                listaInquilinos.eliminarInquilino(inquilino);
 
                 JOptionPane.showMessageDialog(this,
                         "Inquilino eliminado correctamente.");
                 cargarTabla();
-
-            } else {
-
-                JOptionPane.showMessageDialog(this,
-                        "No se pudo eliminar el inquilino.");
             }
+
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar 1 Inquilino");
         }
-    }
+    }//GEN-LAST:event_btnEliminarActionPerformed
 
-    private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarActionPerformed
         dispose();
-    }
+    }//GEN-LAST:event_btnCerrarActionPerformed
 
-    /**
-     * Muestra en la tabla todos los inquilinos del ArrayList.
-     */
+    //Muestra en la tabla todos los inquilinos del ArrayList
     public void cargarTabla() {
-        llenarTabla(InquilinoStore.getListaInquilinos());
+        llenarTabla(listaInquilinos.getListaInquilinos());
     }
 
-    /**
-     * Pasa la lista de inquilinos recibida a la tabla.
-     */
+    //Pasa la lista de inquilinos recibida a la tabla
     private void llenarTabla(ArrayList<Inquilino> lista) {
 
         DefaultTableModel modelo =
@@ -426,30 +420,19 @@ public class DlgInquilinos extends javax.swing.JDialog {
 
         modelo.setRowCount(0);
 
-        for (int i = 0; i < lista.size(); i++) {
-
-            Inquilino inquilino = lista.get(i);
-
-            Object[] fila = new Object[8];
-            fila[0] = inquilino.getCedInqui();
-            fila[1] = inquilino.getNomInqui();
-            fila[2] = inquilino.getGenero();
-            fila[3] = formatearFecha(inquilino.getFechNac());
-            fila[4] = inquilino.getDireccion();
-            fila[5] = inquilino.getTelefono();
-            fila[6] = inquilino.getEmail();
-            fila[7] = inquilino.getOcupacion();
-
-            modelo.addRow(fila);
+        for (Inquilino i : lista) {
+            modelo.addRow(new Object[]{
+                i.getCedInqui(), i.getNomInqui(), i.getGenero(),
+                formatearFecha(i.getFechNac()), i.getDireccion(),
+                i.getTelefono(), i.getEmail(), i.getOcupacion()
+            });
         }
 
         txtInquilinosRegistrados.setText(
-                String.valueOf(InquilinoStore.cantidad()));
+                String.valueOf(listaInquilinos.cantidad()));
     }
 
-    /**
-     * Convierte una fecha al formato dd/MM/yyyy para mostrarla.
-     */
+    //Convierte una fecha al formato dd/MM/yyyy para mostrarla
     private String formatearFecha(LocalDate fecha) {
 
         if (fecha == null) {
@@ -492,7 +475,8 @@ public class DlgInquilinos extends javax.swing.JDialog {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                DlgInquilinos dialog = new DlgInquilinos(new javax.swing.JFrame(), true);
+                DlgInquilinos dialog = new DlgInquilinos(new javax.swing.JFrame(), true,
+                        new InquilinoStore(), new AlquilerStore());
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

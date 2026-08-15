@@ -16,36 +16,38 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * Ventana del módulo de mensualidades.
- *
- * Aquí se generan automáticamente las mensualidades de los alquileres
- * vigentes de un mes y año, se pueden mostrar en otra ventana y se
- * pueden filtrar por inquilino, mes y año.
  *
  * @author mauri
  */
 public class DlgMensualidades extends javax.swing.JDialog {
 
-    /**
-     * Nombres de los meses para mostrarlos en pantalla.
-     */
+    //Nombres de los meses para mostrarlos en pantalla
     private final String[] nombresMeses = {
         "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
         "Julio", "Agosto", "Setiembre", "Octubre",
         "Noviembre", "Diciembre"
     };
 
+    MensualidadStore listaMensualidades;
+    AlquilerStore listaAlquileres;
+    InquilinoStore listaInquilinos;
+
     /**
      * Creates new form DlgMensualidades
      */
-    public DlgMensualidades(java.awt.Frame parent, boolean modal) {
+    public DlgMensualidades(java.awt.Frame parent, boolean modal,
+            MensualidadStore listaMensualidades, AlquilerStore listaAlquileres,
+            InquilinoStore listaInquilinos) {
 
         super(parent, modal);
         initComponents();
+        this.listaMensualidades = listaMensualidades;
+        this.listaAlquileres = listaAlquileres;
+        this.listaInquilinos = listaInquilinos;
 
         mostrarFechaActual();
         cargarInquilinosFiltro();
-        cargarTabla(MensualidadStore.getListaMensualidades());
+        cargarTabla(listaMensualidades.getListaMensualidades());
     }
 
     /**
@@ -67,19 +69,14 @@ public class DlgMensualidades extends javax.swing.JDialog {
         txtAnioMensual.setText(String.valueOf(hoy.getYear()));
     }
 
-    /**
-     * Llena el combo de filtro con los inquilinos registrados.
-     */
+    //Llena el combo de filtro con los inquilinos registrados
     private void cargarInquilinosFiltro() {
 
         cmbFiltroInquilino.removeAllItems();
         cmbFiltroInquilino.addItem("Todos los Inquilinos");
 
-        ArrayList<Inquilino> lista =
-                InquilinoStore.getListaInquilinos();
-
-        for (int i = 0; i < lista.size(); i++) {
-            cmbFiltroInquilino.addItem(lista.get(i).getNomInqui());
+        for (Inquilino i : listaInquilinos.getListaInquilinos()) {
+            cmbFiltroInquilino.addItem(i.getNomInqui());
         }
     }
 
@@ -441,7 +438,7 @@ public class DlgMensualidades extends javax.swing.JDialog {
             return;
         }
 
-        if (!MensualidadStore.periodoValido(mes, anio)) {
+        if (!listaMensualidades.periodoValido(mes, anio)) {
 
             JOptionPane.showMessageDialog(this,
                     "No se pueden generar recibos para una fecha "
@@ -449,7 +446,7 @@ public class DlgMensualidades extends javax.swing.JDialog {
             return;
         }
 
-        if (AlquilerStore.obtenerVigentes().isEmpty()) {
+        if (listaAlquileres.listaVigentes().isEmpty()) {
 
             JOptionPane.showMessageDialog(this,
                     "No hay alquileres vigentes para generar "
@@ -457,7 +454,8 @@ public class DlgMensualidades extends javax.swing.JDialog {
             return;
         }
 
-        int generadas = MensualidadStore.generarMensualidades(mes, anio);
+        int generadas = listaMensualidades.generarMensualidades(
+                mes, anio, listaAlquileres.listaVigentes());
 
         if (generadas > 0) {
 
@@ -475,7 +473,7 @@ public class DlgMensualidades extends javax.swing.JDialog {
         }
 
         // Se muestran en la tabla las mensualidades de ese periodo
-        cargarTabla(MensualidadStore.buscarPorPeriodo(mes, anio));
+        cargarTabla(listaMensualidades.buscarPorPeriodo(mes, anio));
     }//GEN-LAST:event_btnGenerarActionPerformed
 
     private void btnMostrarMensualidadesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarMensualidadesActionPerformed
@@ -488,16 +486,15 @@ public class DlgMensualidades extends javax.swing.JDialog {
             return;
         }
 
-        if (MensualidadStore.filtrar("", mes, anio).isEmpty()) {
+        if (listaMensualidades.filtrar("", mes, anio).isEmpty()) {
 
             JOptionPane.showMessageDialog(this,
                     "No hay mensualidades registradas en ese periodo.");
             return;
         }
 
-        DlgMostrarMensualidades ventana =
-                new DlgMostrarMensualidades(
-                        (java.awt.Frame) getOwner(), true);
+        DlgMostrarMensualidades ventana = new DlgMostrarMensualidades(
+                (java.awt.Frame) getOwner(), true, listaMensualidades);
 
         ventana.cargarPeriodo(mes, anio);
         ventana.setLocationRelativeTo(this);
@@ -526,7 +523,7 @@ public class DlgMensualidades extends javax.swing.JDialog {
         }
 
         ArrayList<Mensualidades> encontradas =
-                MensualidadStore.filtrar(inquilino, mes, anio);
+                listaMensualidades.filtrar(inquilino, mes, anio);
 
         if (encontradas.isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -542,18 +539,15 @@ public class DlgMensualidades extends javax.swing.JDialog {
         cmbMes.setSelectedIndex(0);
         txtAnioMensualidad.setText("");
 
-        cargarTabla(MensualidadStore.getListaMensualidades());
+        cargarTabla(listaMensualidades.getListaMensualidades());
     }//GEN-LAST:event_btnLimpiarActionPerformed
 
     private void btnCancelarMensuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarMensuActionPerformed
         dispose();
     }//GEN-LAST:event_btnCancelarMensuActionPerformed
 
-    /**
-     * Convierte el texto del año a número y lo valida.
-     *
-     * @return el año digitado o 0 si el dato está malo
-     */
+    //Convierte el texto del año a número y lo valida
+    //Retorna 0 si el dato está malo
     private int leerAnio(String texto) {
 
         String valor = texto.trim();
@@ -584,9 +578,7 @@ public class DlgMensualidades extends javax.swing.JDialog {
         }
     }
 
-    /**
-     * Pasa la lista de mensualidades recibida a la tabla.
-     */
+    //Pasa la lista de mensualidades recibida a la tabla
     private void cargarTabla(ArrayList<Mensualidades> lista) {
 
         DefaultTableModel modelo =
@@ -594,37 +586,19 @@ public class DlgMensualidades extends javax.swing.JDialog {
 
         modelo.setRowCount(0);
 
-        for (int i = 0; i < lista.size(); i++) {
-
-            Mensualidades mensualidad = lista.get(i);
-
-            int numeroAlquiler = 0;
-
-            if (mensualidad.getAlquiler() != null) {
-                numeroAlquiler =
-                        mensualidad.getAlquiler().getNumAlquiler();
-            }
-
-            Object[] fila = new Object[9];
-            fila[0] = mensualidad.getConsecutivo();
-            fila[1] = numeroAlquiler;
-            fila[2] = formatearFecha(mensualidad.getFechCreacion());
-            fila[3] = mensualidad.getNomInquilino();
-            fila[4] = nombresMeses[mensualidad.getMesCobro() - 1];
-            fila[5] = mensualidad.getAnioActual();
-            fila[6] = mensualidad.getDescuento();
-            fila[7] = mensualidad.getMontoMes();
-            fila[8] = mensualidad.getEstado();
-
-            modelo.addRow(fila);
+        for (Mensualidades m : lista) {
+            modelo.addRow(new Object[]{
+                m.getConsecutivo(), m.getAlquiler().getNumAlquiler(),
+                formatearFecha(m.getFechCreacion()), m.getNomInquilino(),
+                nombresMeses[m.getMesCobro() - 1], m.getAnioActual(),
+                m.getDescuento(), m.getMontoMes(), m.getEstado()
+            });
         }
 
         txtTotalRegistros.setText(String.valueOf(lista.size()));
     }
 
-    /**
-     * Convierte una fecha al formato dd/MM/yyyy para mostrarla.
-     */
+    //Convierte una fecha al formato dd/MM/yyyy para mostrarla
     private String formatearFecha(LocalDate fecha) {
 
         if (fecha == null) {
@@ -667,7 +641,8 @@ public class DlgMensualidades extends javax.swing.JDialog {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                DlgMensualidades dialog = new DlgMensualidades(new javax.swing.JFrame(), true);
+                DlgMensualidades dialog = new DlgMensualidades(new javax.swing.JFrame(), true,
+                        new MensualidadStore(), new AlquilerStore(), new InquilinoStore());
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

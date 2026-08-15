@@ -12,60 +12,44 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 /**
- * Ventana para registrar una vivienda nueva o para editar una
- * que ya existe en el ArrayList de viviendas.
- *
- * La vivienda guarda un objeto de tipo Propietario (agregación),
- * por eso el propietario debe existir antes de registrar la casa.
  *
  * @author mauri
  */
 public class DlgNuevaVivienda extends javax.swing.JDialog {
 
-    /**
-     * Vivienda que se está editando.
-     * Si vale null quiere decir que se está registrando una nueva.
-     */
-    private Vivienda viviendaEditar = null;
+    ViviendaStore listaViviendas;
+    PropietarioStore listaPropietarios;
+    Vivienda vivienda;
+    int pos;
 
     /**
      * Creates new form DlgNuevaVivienda
      */
-    public DlgNuevaVivienda(java.awt.Frame parent, boolean modal) {
+    public DlgNuevaVivienda(java.awt.Frame parent, boolean modal,
+            ViviendaStore listaViviendas, PropietarioStore listaPropietarios) {
 
         super(parent, modal);
         initComponents();
+        this.listaViviendas = listaViviendas;
+        this.listaPropietarios = listaPropietarios;
         cargarPropietarios();
     }
 
-    /**
-     * Llena el combo con los propietarios registrados.
-     */
-    private void cargarPropietarios() {
+    public DlgNuevaVivienda(java.awt.Frame parent, boolean modal,
+            ViviendaStore listaViviendas, PropietarioStore listaPropietarios,
+            Vivienda vivienda, int pos) {
 
-        cmbPropietario.removeAllItems();
-        cmbPropietario.addItem("Seleccione");
+        super(parent, modal);
+        initComponents();
+        this.listaViviendas = listaViviendas;
+        this.listaPropietarios = listaPropietarios;
+        this.vivienda = vivienda;
+        this.pos = pos;
+        cargarPropietarios();
 
-        ArrayList<Propietario> lista =
-                PropietarioStore.getListaPropietarios();
-
-        for (int i = 0; i < lista.size(); i++) {
-
-            Propietario propietario = lista.get(i);
-
-            cmbPropietario.addItem(propietario.getCedPropiet()
-                    + " - " + propietario.getNomPropiet());
-        }
-    }
-
-    /**
-     * Carga en pantalla los datos de una vivienda para editarla.
-     */
-    public void cargarVivienda(Vivienda vivienda) {
-
-        this.viviendaEditar = vivienda;
-
+        setTitle("Editar Vivienda");
         txtIdVivienda.setText(String.valueOf(vivienda.getIdVivienda()));
+        txtIdVivienda.setEnabled(false);
         txtDescripcion.setText(vivienda.getDescripcion());
         txtDireccion.setText(vivienda.getDireccion());
         txtMetConstruccion.setText(String.valueOf(vivienda.getMtsConstruct()));
@@ -79,12 +63,19 @@ public class DlgNuevaVivienda extends javax.swing.JDialog {
         txtDepositoGarantia.setText(
                 String.valueOf(vivienda.getDepositoGarantia()));
         cmbEstado.setSelectedItem(vivienda.getEstado());
+        cmbPropietario.setSelectedItem(
+                vivienda.getPropietario().getCedPropiet()
+                + " - " + vivienda.getPropietario().getNomPropiet());
+    }
 
-        if (vivienda.getPropietario() != null) {
+    //Llena el combo con los propietarios registrados
+    private void cargarPropietarios() {
 
-            cmbPropietario.setSelectedItem(
-                    vivienda.getPropietario().getCedPropiet()
-                    + " - " + vivienda.getPropietario().getNomPropiet());
+        cmbPropietario.removeAllItems();
+        cmbPropietario.addItem("Seleccione");
+
+        for (Propietario p : listaPropietarios.getListaPropietarios()) {
+            cmbPropietario.addItem(p.getCedPropiet() + " - " + p.getNomPropiet());
         }
     }
 
@@ -511,49 +502,33 @@ public class DlgNuevaVivienda extends javax.swing.JDialog {
                 txtDepositoGarantia.getText().trim().replace(",", "."));
         String estado = cmbEstado.getSelectedItem().toString();
 
-        if (viviendaEditar == null) {
+        Vivienda nueva = new Vivienda(
+                id, descripcion, direccion, mtsConstruct, mtsLote,
+                tipoConstruccion, cochera, cantHabitac, cantBanios,
+                carretera, precioBase, deposito, propietario, estado);
 
-            // Registro nuevo
-            Vivienda nueva = new Vivienda(
-                    id, descripcion, direccion, mtsConstruct, mtsLote,
-                    tipoConstruccion, cochera, cantHabitac, cantBanios,
-                    carretera, precioBase, deposito, propietario, estado);
+        if (vivienda == null) {
 
-            if (ViviendaStore.insertar(nueva)) {
+            //Registro nuevo
+            if (listaViviendas.buscarId(id) == null) {
 
+                listaViviendas.insertarVivienda(nueva);
                 JOptionPane.showMessageDialog(this,
                         "Vivienda registrada correctamente.");
                 dispose();
 
             } else {
-
                 JOptionPane.showMessageDialog(this,
                         "Ya existe una vivienda con ese ID.");
             }
 
         } else {
 
-            // Modificación de una vivienda existente
-            int indice = ViviendaStore.buscarIndice(
-                    viviendaEditar.getIdVivienda());
-
-            Vivienda modificada = new Vivienda(
-                    id, descripcion, direccion, mtsConstruct, mtsLote,
-                    tipoConstruccion, cochera, cantHabitac, cantBanios,
-                    carretera, precioBase, deposito, propietario, estado);
-
-            if (ViviendaStore.modificar(indice, modificada)) {
-
-                JOptionPane.showMessageDialog(this,
-                        "Vivienda modificada correctamente.");
-                dispose();
-
-            } else {
-
-                JOptionPane.showMessageDialog(this,
-                        "No se pudo modificar. "
-                        + "Ya existe otra vivienda con ese ID.");
-            }
+            //Modificación de una vivienda existente
+            listaViviendas.editarVivienda(pos, nueva);
+            JOptionPane.showMessageDialog(this,
+                    "Vivienda modificada correctamente.");
+            dispose();
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
@@ -561,57 +536,40 @@ public class DlgNuevaVivienda extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
-    /**
-     * Busca en el ArrayList el propietario elegido en el combo.
-     *
-     * En el combo se muestra "cédula - nombre", entonces se toma
-     * la parte de la cédula para poder buscarlo.
-     */
+    //Busca en el ArrayList el propietario elegido en el combo
+    //En el combo se muestra "cédula - nombre", se toma la cédula
     private Propietario obtenerPropietarioSeleccionado() {
 
         String seleccion = cmbPropietario.getSelectedItem().toString();
-
         int posicionGuion = seleccion.indexOf(" - ");
 
         if (posicionGuion == -1) {
             return null;
         }
 
-        try {
-
-            int cedula = Integer.parseInt(
-                    seleccion.substring(0, posicionGuion).trim());
-
-            return PropietarioStore.buscarPorCedula(cedula);
-
-        } catch (NumberFormatException error) {
-            return null;
-        }
+        int cedula = Integer.parseInt(seleccion.substring(0, posicionGuion).trim());
+        return listaPropietarios.buscarCedula(cedula);
     }
 
-    /**
-     * Revisa que todos los datos digitados sean correctos.
-     *
-     * @return true si todo está bien, false si hay algún error
-     */
+    //Validación de campos vacíos y datos numéricos
     private boolean validarCampos() {
+
+        if (txtIdVivienda.getText().isBlank()
+                || txtDescripcion.getText().isBlank()
+                || txtDireccion.getText().isBlank()
+                || txtMetConstruccion.getText().isBlank()
+                || txtMetrosLote.getText().isBlank()
+                || txtCantHabitaciones.getText().isBlank()
+                || txtCantBaños.getText().isBlank()
+                || txtPrecioBase.getText().isBlank()
+                || txtDepositoGarantia.getText().isBlank()) {
+
+            JOptionPane.showMessageDialog(this, "Hay campos vacíos");
+            return false;
+        }
 
         if (!numeroEnteroValido(txtIdVivienda.getText(),
                 "el ID de la vivienda")) {
-            return false;
-        }
-
-        if (txtDescripcion.getText().trim().equals("")) {
-            JOptionPane.showMessageDialog(this,
-                    "Debe digitar la descripción de la vivienda.");
-            txtDescripcion.requestFocus();
-            return false;
-        }
-
-        if (txtDireccion.getText().trim().equals("")) {
-            JOptionPane.showMessageDialog(this,
-                    "Debe digitar la dirección de la vivienda.");
-            txtDireccion.requestFocus();
             return false;
         }
 
@@ -778,7 +736,8 @@ public class DlgNuevaVivienda extends javax.swing.JDialog {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                DlgNuevaVivienda dialog = new DlgNuevaVivienda(new javax.swing.JFrame(), true);
+                DlgNuevaVivienda dialog = new DlgNuevaVivienda(new javax.swing.JFrame(), true,
+                        new ViviendaStore(), new PropietarioStore());
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

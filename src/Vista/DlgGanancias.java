@@ -16,23 +16,24 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * Ventana del módulo de ganancias.
- *
- * GuanaRent gana la mitad del depósito de garantía de cada alquiler
- * y un 5% de cada mensualidad. Las ganancias se pueden consultar de
- * todo un año o de un mes específico.
  *
  * @author mauri
  */
 public class DlgGanancias extends javax.swing.JDialog {
 
+    AlquilerStore listaAlquileres;
+    MensualidadStore listaMensualidades;
+
     /**
      * Creates new form DlgGanancias
      */
-    public DlgGanancias(java.awt.Frame parent, boolean modal) {
+    public DlgGanancias(java.awt.Frame parent, boolean modal,
+            AlquilerStore listaAlquileres, MensualidadStore listaMensualidades) {
 
         super(parent, modal);
         initComponents();
+        this.listaAlquileres = listaAlquileres;
+        this.listaMensualidades = listaMensualidades;
 
         // Los dos radio botones deben trabajar juntos, así solo se
         // puede escoger una opción a la vez.
@@ -359,58 +360,36 @@ public class DlgGanancias extends javax.swing.JDialog {
         cargarTablaDepositos(mes, anio);
     }//GEN-LAST:event_btnCalcularGananciasActionPerformed
 
-    /**
-     * Suma la mitad del depósito de garantía de cada alquiler
-     * del periodo consultado.
-     *
-     * @param mes número del mes o 0 para todo el año
-     * @param anio año consultado
-     * @return la ganancia por depósitos
-     */
+    //Suma la mitad del depósito de garantía de cada alquiler del periodo
     private double calcularGananciaDepositos(int mes, int anio) {
 
         double ganancia = 0;
 
-        ArrayList<Alquileres> lista =
-                AlquilerStore.getListaAlquileres();
-
-        for (int i = 0; i < lista.size(); i++) {
-
-            Alquileres alquiler = lista.get(i);
-
-            if (esDelPeriodo(alquiler, mes, anio)) {
-                ganancia = ganancia
-                        + alquiler.getDepositoGarantia() * 0.50;
+        for (Alquileres a : listaAlquileres.getListaAlquileres()) {
+            if (esDelPeriodo(a, mes, anio)) {
+                ganancia = ganancia + a.getDepositoGarantia() * 0.50;
             }
         }
 
         return ganancia;
     }
 
-    /**
-     * Suma el 5% de cada mensualidad del periodo consultado.
-     *
-     * @param mes número del mes o 0 para todo el año
-     * @param anio año consultado
-     * @return la ganancia por mensualidades
-     */
+    //Suma el 5% de cada mensualidad del periodo consultado
     private double calcularGananciaMensualidades(int mes, int anio) {
 
         double ganancia = 0;
 
         ArrayList<Mensualidades> lista =
-                MensualidadStore.filtrar("", mes, anio);
+                listaMensualidades.filtrar("", mes, anio);
 
-        for (int i = 0; i < lista.size(); i++) {
-            ganancia = ganancia + lista.get(i).getMontoMes() * 0.05;
+        for (Mensualidades m : lista) {
+            ganancia = ganancia + m.getMontoMes() * 0.05;
         }
 
         return ganancia;
     }
 
-    /**
-     * Revisa si el contrato de alquiler se firmó en el periodo.
-     */
+    //Revisa si el contrato de alquiler se firmó en el periodo
     private boolean esDelPeriodo(Alquileres alquiler, int mes, int anio) {
 
         if (alquiler.getFechContrato() == null) {
@@ -430,10 +409,8 @@ public class DlgGanancias extends javax.swing.JDialog {
         return true;
     }
 
-    /**
-     * Muestra en la tabla los alquileres que dejaron ganancia
-     * por depósito en el periodo consultado.
-     */
+    //Muestra en la tabla los alquileres con ganancia por depósito
+    //en el periodo consultado
     private void cargarTablaDepositos(int mes, int anio) {
 
         DefaultTableModel modelo =
@@ -441,40 +418,22 @@ public class DlgGanancias extends javax.swing.JDialog {
 
         modelo.setRowCount(0);
 
-        ArrayList<Alquileres> lista =
-                AlquilerStore.getListaAlquileres();
+        for (Alquileres a : listaAlquileres.getListaAlquileres()) {
 
-        for (int i = 0; i < lista.size(); i++) {
-
-            Alquileres alquiler = lista.get(i);
-
-            if (!esDelPeriodo(alquiler, mes, anio)) {
+            if (!esDelPeriodo(a, mes, anio)) {
                 continue;
             }
 
-            String nombreInquilino = "Sin inquilino";
-
-            if (alquiler.getInquilino() != null) {
-                nombreInquilino = alquiler.getInquilino().getNomInqui();
-            }
-
-            Object[] fila = new Object[5];
-            fila[0] = alquiler.getNumAlquiler();
-            fila[1] = formatearFecha(alquiler.getFechContrato());
-            fila[2] = nombreInquilino;
-            fila[3] = alquiler.getDepositoGarantia();
-            fila[4] = formatearMonto(
-                    alquiler.getDepositoGarantia() * 0.50);
-
-            modelo.addRow(fila);
+            modelo.addRow(new Object[]{
+                a.getNumAlquiler(), formatearFecha(a.getFechContrato()),
+                a.getInquilino().getNomInqui(), a.getDepositoGarantia(),
+                formatearMonto(a.getDepositoGarantia() * 0.50)
+            });
         }
     }
 
-    /**
-     * Lee el año del control y revisa que sea válido.
-     *
-     * @return el año o 0 si el dato está malo
-     */
+    //Lee el año del control y revisa que sea válido
+    //Retorna 0 si el dato está malo
     private int leerAnio() {
 
         try {
@@ -549,7 +508,8 @@ public class DlgGanancias extends javax.swing.JDialog {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                DlgGanancias dialog = new DlgGanancias(new javax.swing.JFrame(), true);
+                DlgGanancias dialog = new DlgGanancias(new javax.swing.JFrame(), true,
+                        new AlquilerStore(), new MensualidadStore());
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

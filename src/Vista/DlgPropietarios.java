@@ -12,22 +12,23 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * Ventana con el listado de propietarios.
- *
- * Permite buscar, agregar, editar y eliminar propietarios del
- * ArrayList que se encuentra en PropietarioStore.
  *
  * @author mauri
  */
 public class DlgPropietarios extends javax.swing.JDialog {
 
+    PropietarioStore listaPropietarios;
+    ViviendaStore listaViviendas;
+
     /**
      * Creates new form DlgPropietarios
      */
-    public DlgPropietarios(java.awt.Frame parent, boolean modal) {
+    public DlgPropietarios(java.awt.Frame parent, boolean modal,
+            PropietarioStore listaPropietarios, ViviendaStore listaViviendas) {
         super(parent, modal);
         initComponents();
-        cargarTabla();
+        this.listaPropietarios = listaPropietarios;
+        this.listaViviendas = listaViviendas;
     }
 
     /**
@@ -60,6 +61,11 @@ public class DlgPropietarios extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Gestión de Propietarios");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+        });
 
         jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
@@ -69,6 +75,11 @@ public class DlgPropietarios extends javax.swing.JDialog {
         txtBuscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtBuscarActionPerformed(evt);
+            }
+        });
+        txtBuscar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtBuscarKeyReleased(evt);
             }
         });
 
@@ -280,15 +291,21 @@ public class DlgPropietarios extends javax.swing.JDialog {
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
 
-        String texto = txtBuscar.getText().trim();
+        String texto = txtBuscar.getText().trim().toLowerCase();
 
         if (texto.equals("")) {
             cargarTabla();
             return;
         }
 
-        ArrayList<Propietario> encontrados =
-                PropietarioStore.buscarPorTexto(texto);
+        ArrayList<Propietario> encontrados = new ArrayList();
+
+        for (Propietario p : listaPropietarios.getListaPropietarios()) {
+            if (String.valueOf(p.getCedPropiet()).contains(texto)
+                    || p.getNomPropiet().toLowerCase().contains(texto)) {
+                encontrados.add(p);
+            }
+        }
 
         if (encontrados.isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -305,81 +322,73 @@ public class DlgPropietarios extends javax.swing.JDialog {
 
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
 
-        DlgNuevoPropietario ventana = new DlgNuevoPropietario();
-        ventana.setVentanaListado(this);
+        DlgNuevoPropietario ventana = new DlgNuevoPropietario(listaPropietarios);
         ventana.setLocationRelativeTo(this);
         ventana.setVisible(true);
     }//GEN-LAST:event_btnNuevoActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
 
-        int fila = tblPropietarios.getSelectedRow();
+        if (tblPropietarios.getSelectedRowCount() == 1) {
 
-        if (fila == -1) {
+            int fila = tblPropietarios.getSelectedRow();
+
+            int cedula = Integer.parseInt(
+                    tblPropietarios.getValueAt(fila, 0).toString());
+
+            Propietario propietario = listaPropietarios.buscarCedula(cedula);
+            int pos = listaPropietarios.getListaPropietarios().indexOf(propietario);
+
+            DlgNuevoPropietario ventana =
+                    new DlgNuevoPropietario(listaPropietarios, propietario, pos);
+            ventana.setLocationRelativeTo(this);
+            ventana.setVisible(true);
+
+        } else {
             JOptionPane.showMessageDialog(this,
-                    "Seleccione en la tabla el propietario que desea editar.");
-            return;
+                    "Debe seleccionar 1 Propietario");
         }
-
-        int cedula = Integer.parseInt(
-                tblPropietarios.getValueAt(fila, 0).toString());
-
-        Propietario propietario = PropietarioStore.buscarPorCedula(cedula);
-
-        if (propietario == null) {
-            JOptionPane.showMessageDialog(this,
-                    "El propietario ya no existe en el sistema.");
-            cargarTabla();
-            return;
-        }
-
-        DlgNuevoPropietario ventana = new DlgNuevoPropietario();
-        ventana.setVentanaListado(this);
-        ventana.cargarPropietario(propietario);
-        ventana.setLocationRelativeTo(this);
-        ventana.setVisible(true);
     }//GEN-LAST:event_btnEditarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
 
-        int fila = tblPropietarios.getSelectedRow();
+        if (tblPropietarios.getSelectedRowCount() == 1) {
 
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(this,
-                    "Seleccione en la tabla el propietario que desea eliminar.");
-            return;
-        }
+            int fila = tblPropietarios.getSelectedRow();
 
-        int cedula = Integer.parseInt(
-                tblPropietarios.getValueAt(fila, 0).toString());
+            int cedula = Integer.parseInt(
+                    tblPropietarios.getValueAt(fila, 0).toString());
 
-        // Un propietario con viviendas registradas no se puede borrar
-        if (ViviendaStore.buscarPorPropietario(cedula).size() > 0) {
+            // Un propietario con viviendas registradas no se puede borrar
+            for (int i = 0; i < listaViviendas.getListaViviendas().size(); i++) {
+                if (listaViviendas.getListaViviendas().get(i)
+                        .getPropietario().getCedPropiet() == cedula) {
 
-            JOptionPane.showMessageDialog(this,
-                    "No se puede eliminar: el propietario tiene "
-                    + "viviendas registradas.");
-            return;
-        }
+                    JOptionPane.showMessageDialog(this,
+                            "No se puede eliminar: el propietario tiene "
+                            + "viviendas registradas.");
+                    return;
+                }
+            }
 
-        int respuesta = JOptionPane.showConfirmDialog(this,
-                "¿Seguro que desea eliminar este propietario?",
-                "Eliminar",
-                JOptionPane.YES_NO_OPTION);
+            int respuesta = JOptionPane.showConfirmDialog(this,
+                    "¿Seguro que desea eliminar este propietario?",
+                    "Eliminar",
+                    JOptionPane.YES_NO_OPTION);
 
-        if (respuesta == JOptionPane.YES_OPTION) {
+            if (respuesta == JOptionPane.YES_OPTION) {
 
-            if (PropietarioStore.eliminarPorCedula(cedula)) {
+                Propietario propietario = listaPropietarios.buscarCedula(cedula);
+                listaPropietarios.eliminarPropietario(propietario);
 
                 JOptionPane.showMessageDialog(this,
                         "Propietario eliminado correctamente.");
                 cargarTabla();
-
-            } else {
-
-                JOptionPane.showMessageDialog(this,
-                        "No se pudo eliminar el propietario.");
             }
+
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar 1 Propietario");
         }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
@@ -387,16 +396,20 @@ public class DlgPropietarios extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_btnCerrarActionPerformed
 
-    /**
-     * Muestra en la tabla todos los propietarios del ArrayList.
-     */
+    private void txtBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarKeyReleased
+        btnBuscarActionPerformed(null);
+    }//GEN-LAST:event_txtBuscarKeyReleased
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        cargarTabla();
+    }//GEN-LAST:event_formWindowActivated
+
+    //Muestra en la tabla todos los propietarios del ArrayList
     public void cargarTabla() {
-        llenarTabla(PropietarioStore.getListaPropietarios());
+        llenarTabla(listaPropietarios.getListaPropietarios());
     }
 
-    /**
-     * Pasa la lista de propietarios recibida a la tabla.
-     */
+    //Pasa la lista de propietarios recibida a la tabla
     private void llenarTabla(ArrayList<Propietario> lista) {
 
         DefaultTableModel modelo =
@@ -404,23 +417,15 @@ public class DlgPropietarios extends javax.swing.JDialog {
 
         modelo.setRowCount(0);
 
-        for (int i = 0; i < lista.size(); i++) {
-
-            Propietario propietario = lista.get(i);
-
-            Object[] fila = new Object[6];
-            fila[0] = propietario.getCedPropiet();
-            fila[1] = propietario.getNomPropiet();
-            fila[2] = propietario.getGenero();
-            fila[3] = propietario.getDireccion();
-            fila[4] = propietario.getTelefono();
-            fila[5] = propietario.getEmail();
-
-            modelo.addRow(fila);
+        for (Propietario p : lista) {
+            modelo.addRow(new Object[]{
+                p.getCedPropiet(), p.getNomPropiet(), p.getGenero(),
+                p.getDireccion(), p.getTelefono(), p.getEmail()
+            });
         }
 
         txtPropietariosRegistrados.setText(
-                String.valueOf(PropietarioStore.cantidad()));
+                String.valueOf(listaPropietarios.cantidad()));
     }
 
     /**
@@ -453,7 +458,8 @@ public class DlgPropietarios extends javax.swing.JDialog {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                DlgPropietarios dialog = new DlgPropietarios(new javax.swing.JFrame(), true);
+                DlgPropietarios dialog = new DlgPropietarios(new javax.swing.JFrame(), true,
+                        new PropietarioStore(), new ViviendaStore());
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

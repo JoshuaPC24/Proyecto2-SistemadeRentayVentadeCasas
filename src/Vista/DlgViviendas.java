@@ -13,22 +13,27 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * Ventana con el listado de viviendas.
- *
- * Permite buscar, agregar, editar y eliminar viviendas del
- * ArrayList que se encuentra en ViviendaStore.
  *
  * @author mauri
  */
 public class DlgViviendas extends javax.swing.JDialog {
 
+    ViviendaStore listaViviendas;
+    PropietarioStore listaPropietarios;
+    AlquilerStore listaAlquileres;
+
     /**
      * Creates new form DlgViviendas
      */
-    public DlgViviendas(java.awt.Frame parent, boolean modal) {
+    public DlgViviendas(java.awt.Frame parent, boolean modal,
+            ViviendaStore listaViviendas, PropietarioStore listaPropietarios,
+            AlquilerStore listaAlquileres) {
+
         super(parent, modal);
         initComponents();
-        cargarTabla();
+        this.listaViviendas = listaViviendas;
+        this.listaPropietarios = listaPropietarios;
+        this.listaAlquileres = listaAlquileres;
     }
 
     /**
@@ -60,6 +65,11 @@ public class DlgViviendas extends javax.swing.JDialog {
         jLabel12 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+        });
 
         jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
@@ -69,6 +79,11 @@ public class DlgViviendas extends javax.swing.JDialog {
         txtBuscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtBuscarActionPerformed(evt);
+            }
+        });
+        txtBuscar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtBuscarKeyReleased(evt);
             }
         });
 
@@ -288,15 +303,21 @@ public class DlgViviendas extends javax.swing.JDialog {
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
 
-        String texto = txtBuscar.getText().trim();
+        String texto = txtBuscar.getText().trim().toLowerCase();
 
         if (texto.equals("")) {
             cargarTabla();
             return;
         }
 
-        ArrayList<Vivienda> encontradas =
-                ViviendaStore.buscarPorTexto(texto);
+        ArrayList<Vivienda> encontradas = new ArrayList();
+
+        for (Vivienda v : listaViviendas.getListaViviendas()) {
+            if (String.valueOf(v.getIdVivienda()).contains(texto)
+                    || v.getDescripcion().toLowerCase().contains(texto)) {
+                encontradas.add(v);
+            }
+        }
 
         if (encontradas.isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -314,94 +335,82 @@ public class DlgViviendas extends javax.swing.JDialog {
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
 
         // Para registrar una vivienda debe existir al menos un propietario
-        if (PropietarioStore.estaVacio()) {
+        if (listaPropietarios.getListaPropietarios().isEmpty()) {
 
             JOptionPane.showMessageDialog(this,
                     "Primero debe registrar al menos un propietario.");
             return;
         }
 
-        DlgNuevaVivienda ventana =
-                new DlgNuevaVivienda((java.awt.Frame) getOwner(), true);
+        DlgNuevaVivienda ventana = new DlgNuevaVivienda(
+                (java.awt.Frame) getOwner(), true,
+                listaViviendas, listaPropietarios);
 
         ventana.setLocationRelativeTo(this);
         ventana.setVisible(true);
-
-        cargarTabla();
     }//GEN-LAST:event_btnNuevoActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
 
-        int fila = tblViviendas.getSelectedRow();
+        if (tblViviendas.getSelectedRowCount() == 1) {
 
-        if (fila == -1) {
+            int fila = tblViviendas.getSelectedRow();
+
+            int id = Integer.parseInt(
+                    tblViviendas.getValueAt(fila, 0).toString());
+
+            Vivienda vivienda = listaViviendas.buscarId(id);
+            int pos = listaViviendas.getListaViviendas().indexOf(vivienda);
+
+            DlgNuevaVivienda ventana = new DlgNuevaVivienda(
+                    (java.awt.Frame) getOwner(), true,
+                    listaViviendas, listaPropietarios, vivienda, pos);
+
+            ventana.setLocationRelativeTo(this);
+            ventana.setVisible(true);
+
+        } else {
             JOptionPane.showMessageDialog(this,
-                    "Seleccione en la tabla la vivienda que desea editar.");
-            return;
+                    "Debe seleccionar 1 Vivienda");
         }
-
-        int id = Integer.parseInt(
-                tblViviendas.getValueAt(fila, 0).toString());
-
-        Vivienda vivienda = ViviendaStore.buscarPorId(id);
-
-        if (vivienda == null) {
-            JOptionPane.showMessageDialog(this,
-                    "La vivienda ya no existe en el sistema.");
-            cargarTabla();
-            return;
-        }
-
-        DlgNuevaVivienda ventana =
-                new DlgNuevaVivienda((java.awt.Frame) getOwner(), true);
-
-        ventana.cargarVivienda(vivienda);
-        ventana.setLocationRelativeTo(this);
-        ventana.setVisible(true);
-
-        cargarTabla();
     }//GEN-LAST:event_btnEditarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
 
-        int fila = tblViviendas.getSelectedRow();
+        if (tblViviendas.getSelectedRowCount() == 1) {
 
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(this,
-                    "Seleccione en la tabla la vivienda que desea eliminar.");
-            return;
-        }
+            int fila = tblViviendas.getSelectedRow();
 
-        int id = Integer.parseInt(
-                tblViviendas.getValueAt(fila, 0).toString());
+            int id = Integer.parseInt(
+                    tblViviendas.getValueAt(fila, 0).toString());
 
-        // Una vivienda con alquileres registrados no se puede borrar
-        if (AlquilerStore.viviendaTieneAlquiler(id)) {
+            // Una vivienda con alquileres registrados no se puede borrar
+            if (listaAlquileres.viviendaTieneAlquiler(id)) {
 
-            JOptionPane.showMessageDialog(this,
-                    "No se puede eliminar: la vivienda tiene "
-                    + "alquileres registrados.");
-            return;
-        }
+                JOptionPane.showMessageDialog(this,
+                        "No se puede eliminar: la vivienda tiene "
+                        + "alquileres registrados.");
+                return;
+            }
 
-        int respuesta = JOptionPane.showConfirmDialog(this,
-                "¿Seguro que desea eliminar esta vivienda?",
-                "Eliminar",
-                JOptionPane.YES_NO_OPTION);
+            int respuesta = JOptionPane.showConfirmDialog(this,
+                    "¿Seguro que desea eliminar esta vivienda?",
+                    "Eliminar",
+                    JOptionPane.YES_NO_OPTION);
 
-        if (respuesta == JOptionPane.YES_OPTION) {
+            if (respuesta == JOptionPane.YES_OPTION) {
 
-            if (ViviendaStore.eliminarPorId(id)) {
+                Vivienda vivienda = listaViviendas.buscarId(id);
+                listaViviendas.eliminarVivienda(vivienda);
 
                 JOptionPane.showMessageDialog(this,
                         "Vivienda eliminada correctamente.");
                 cargarTabla();
-
-            } else {
-
-                JOptionPane.showMessageDialog(this,
-                        "No se pudo eliminar: la vivienda está alquilada.");
             }
+
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar 1 Vivienda");
         }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
@@ -409,16 +418,20 @@ public class DlgViviendas extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_btnCerrarActionPerformed
 
-    /**
-     * Muestra en la tabla todas las viviendas del ArrayList.
-     */
+    private void txtBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarKeyReleased
+        btnBuscarActionPerformed(null);
+    }//GEN-LAST:event_txtBuscarKeyReleased
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        cargarTabla();
+    }//GEN-LAST:event_formWindowActivated
+
+    //Muestra en la tabla todas las viviendas del ArrayList
     public void cargarTabla() {
-        llenarTabla(ViviendaStore.getListaViviendas());
+        llenarTabla(listaViviendas.getListaViviendas());
     }
 
-    /**
-     * Pasa la lista de viviendas recibida a la tabla.
-     */
+    //Pasa la lista de viviendas recibida a la tabla
     private void llenarTabla(ArrayList<Vivienda> lista) {
 
         DefaultTableModel modelo =
@@ -426,30 +439,15 @@ public class DlgViviendas extends javax.swing.JDialog {
 
         modelo.setRowCount(0);
 
-        for (int i = 0; i < lista.size(); i++) {
-
-            Vivienda vivienda = lista.get(i);
-
-            String nombrePropietario = "Sin propietario";
-
-            if (vivienda.getPropietario() != null) {
-                nombrePropietario =
-                        vivienda.getPropietario().getNomPropiet();
-            }
-
-            Object[] fila = new Object[6];
-            fila[0] = vivienda.getIdVivienda();
-            fila[1] = vivienda.getDescripcion();
-            fila[2] = vivienda.getDireccion();
-            fila[3] = nombrePropietario;
-            fila[4] = vivienda.getEstado();
-            fila[5] = vivienda.getPrecioBase();
-
-            modelo.addRow(fila);
+        for (Vivienda v : lista) {
+            modelo.addRow(new Object[]{
+                v.getIdVivienda(), v.getDescripcion(), v.getDireccion(),
+                v.getPropietario().getNomPropiet(), v.getEstado(), v.getPrecioBase()
+            });
         }
 
         txtViviendasRegistradas.setText(
-                String.valueOf(ViviendaStore.cantidad()));
+                String.valueOf(listaViviendas.cantidad()));
     }
 
     /**
@@ -482,7 +480,8 @@ public class DlgViviendas extends javax.swing.JDialog {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                DlgViviendas dialog = new DlgViviendas(new javax.swing.JFrame(), true);
+                DlgViviendas dialog = new DlgViviendas(new javax.swing.JFrame(), true,
+                        new ViviendaStore(), new PropietarioStore(), new AlquilerStore());
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

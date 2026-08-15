@@ -4,20 +4,26 @@
  */
 package Vista;
 
+import Datos.AlquilerStore;
+import Datos.InquilinoStore;
+import Datos.MensualidadStore;
+import Datos.PropietarioStore;
+import Datos.ViviendaStore;
 import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 /**
- * Ventana principal del sistema GuanaRent.
- *
- * Desde aquí se abren los módulos de propietarios, inquilinos, viviendas,
- * alquileres, mensualidades y ganancias, ya sea con los botones del panel
- * izquierdo o con la barra de menú.
  *
  * @author mauri
  */
 public class FrmSistemaGuanaRent extends javax.swing.JFrame {
+
+    PropietarioStore listaPropietarios = new PropietarioStore();
+    InquilinoStore listaInquilinos = new InquilinoStore();
+    ViviendaStore listaViviendas = new ViviendaStore();
+    AlquilerStore listaAlquileres = new AlquilerStore();
+    MensualidadStore listaMensualidades = new MensualidadStore();
 
     /**
      * Creates new form FrmSistemaGuanaRent
@@ -28,8 +34,8 @@ public class FrmSistemaGuanaRent extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         setTitle("Sistema de Alquileres GuanaRent");
 
-        // Los items del menú no tienen evento creado en el diseñador,
-        // por eso aquí se les conecta el mismo código de los botones.
+        // Acerca de y Salir no tienen evento creado en el diseñador,
+        // por eso aquí se conectan.
         conectarMenu();
 
         java.net.URL rutaImagen
@@ -185,18 +191,38 @@ public class FrmSistemaGuanaRent extends javax.swing.JFrame {
 
         mnuPropietarios.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/propietarios.menu.png"))); // NOI18N
         mnuPropietarios.setText("Propietarios");
+        mnuPropietarios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPropietariosActionPerformed(evt);
+            }
+        });
         menuRegistros.add(mnuPropietarios);
 
         mnuInquilinos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/inquilinosmenuu.png"))); // NOI18N
         mnuInquilinos.setText("Inquilinos");
+        mnuInquilinos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuInquilinosActionPerformed(evt);
+            }
+        });
         menuRegistros.add(mnuInquilinos);
 
         mnuViviendas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/viviendasmenuu.png"))); // NOI18N
         mnuViviendas.setText("Viviendas");
+        mnuViviendas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuViviendasActionPerformed(evt);
+            }
+        });
         menuRegistros.add(mnuViviendas);
 
         mnuAlquileres.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/alquileresmenuu.png"))); // NOI18N
         mnuAlquileres.setText("Alquileres");
+        mnuAlquileres.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAlquileresActionPerformed(evt);
+            }
+        });
         menuRegistros.add(mnuAlquileres);
 
         jMenuBar1.add(menuRegistros);
@@ -205,10 +231,20 @@ public class FrmSistemaGuanaRent extends javax.swing.JFrame {
 
         mnuMensualidades.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/mensualidadesmenuu.png"))); // NOI18N
         mnuMensualidades.setText("Mensualidades");
+        mnuMensualidades.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMensualidadesActionPerformed(evt);
+            }
+        });
         menuProcesos.add(mnuMensualidades);
 
         mnuGanancias.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/gananciasmenuu.png"))); // NOI18N
         mnuGanancias.setText("Ganancias");
+        mnuGanancias.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuGananciasActionPerformed(evt);
+            }
+        });
         menuProcesos.add(mnuGanancias);
 
         jMenuBar1.add(menuProcesos);
@@ -252,45 +288,85 @@ public class FrmSistemaGuanaRent extends javax.swing.JFrame {
         // Se abre sin modalidad porque la ventana de registro de
         // propietarios es un JFrame y no se podría usar si esta
         // ventana bloqueara la pantalla.
-        DlgPropietarios ventana = new DlgPropietarios(this, false);
+        DlgPropietarios ventana = new DlgPropietarios(this, false,
+                listaPropietarios, listaViviendas);
         ventana.setLocationRelativeTo(this);
         ventana.setVisible(true);
+
+        this.listaPropietarios = ventana.listaPropietarios;
     }//GEN-LAST:event_btnPropietariosActionPerformed
 
     private void btnInquilinosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInquilinosActionPerformed
 
-        DlgInquilinos ventana = new DlgInquilinos(this, true);
+        DlgInquilinos ventana = new DlgInquilinos(this, true,
+                listaInquilinos, listaAlquileres);
         ventana.setLocationRelativeTo(this);
         ventana.setVisible(true);
+
+        this.listaInquilinos = ventana.listaInquilinos;
     }//GEN-LAST:event_btnInquilinosActionPerformed
 
     private void btnViviendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViviendasActionPerformed
 
-        DlgViviendas ventana = new DlgViviendas(this, true);
+        DlgViviendas ventana = new DlgViviendas(this, true,
+                listaViviendas, listaPropietarios, listaAlquileres);
         ventana.setLocationRelativeTo(this);
         ventana.setVisible(true);
+
+        this.listaViviendas = ventana.listaViviendas;
     }//GEN-LAST:event_btnViviendasActionPerformed
 
     private void btnAlquileresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAlquileresActionPerformed
 
-        DlgAlquileres ventana = new DlgAlquileres(this, true);
+        DlgAlquileres ventana = new DlgAlquileres(this, true,
+                listaAlquileres, listaInquilinos, listaViviendas, listaMensualidades);
         ventana.setLocationRelativeTo(this);
         ventana.setVisible(true);
+
+        this.listaAlquileres = ventana.listaAlquileres;
     }//GEN-LAST:event_btnAlquileresActionPerformed
 
     private void btnMensualidadesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMensualidadesActionPerformed
 
-        DlgMensualidades ventana = new DlgMensualidades(this, true);
+        DlgMensualidades ventana = new DlgMensualidades(this, true,
+                listaMensualidades, listaAlquileres, listaInquilinos);
         ventana.setLocationRelativeTo(this);
         ventana.setVisible(true);
+
+        this.listaMensualidades = ventana.listaMensualidades;
     }//GEN-LAST:event_btnMensualidadesActionPerformed
 
     private void btnGananciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGananciasActionPerformed
 
-        DlgGanancias ventana = new DlgGanancias(this, true);
+        DlgGanancias ventana = new DlgGanancias(this, true,
+                listaAlquileres, listaMensualidades);
         ventana.setLocationRelativeTo(this);
         ventana.setVisible(true);
     }//GEN-LAST:event_btnGananciasActionPerformed
+
+    private void mnuPropietariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPropietariosActionPerformed
+        btnPropietariosActionPerformed(evt);
+    }//GEN-LAST:event_mnuPropietariosActionPerformed
+
+    private void mnuInquilinosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuInquilinosActionPerformed
+        btnInquilinosActionPerformed(evt);
+    }//GEN-LAST:event_mnuInquilinosActionPerformed
+
+    private void mnuViviendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuViviendasActionPerformed
+        btnViviendasActionPerformed(evt);
+    }//GEN-LAST:event_mnuViviendasActionPerformed
+
+    private void mnuAlquileresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAlquileresActionPerformed
+        btnAlquileresActionPerformed(evt);
+    }//GEN-LAST:event_mnuAlquileresActionPerformed
+
+    private void mnuMensualidadesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMensualidadesActionPerformed
+        btnMensualidadesActionPerformed(evt);
+    }//GEN-LAST:event_mnuMensualidadesActionPerformed
+
+    private void mnuGananciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGananciasActionPerformed
+        btnGananciasActionPerformed(evt);
+    }//GEN-LAST:event_mnuGananciasActionPerformed
 
     private void mnuAcercaDeActionPerformed(java.awt.event.ActionEvent evt) {
 
@@ -317,48 +393,10 @@ public class FrmSistemaGuanaRent extends javax.swing.JFrame {
     }
 
     /**
-     * Conecta cada opción de la barra de menú con su evento.
-     *
-     * Las opciones del menú hacen lo mismo que los botones, por eso
-     * llaman al evento del botón que les corresponde.
+     * Conecta con su evento las opciones del menú que no quedaron
+     * conectadas desde el diseñador (Acerca de y Salir).
      */
     private void conectarMenu() {
-
-        mnuPropietarios.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPropietariosActionPerformed(evt);
-            }
-        });
-
-        mnuInquilinos.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnInquilinosActionPerformed(evt);
-            }
-        });
-
-        mnuViviendas.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnViviendasActionPerformed(evt);
-            }
-        });
-
-        mnuAlquileres.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAlquileresActionPerformed(evt);
-            }
-        });
-
-        mnuMensualidades.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnMensualidadesActionPerformed(evt);
-            }
-        });
-
-        mnuGanancias.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGananciasActionPerformed(evt);
-            }
-        });
 
         mnuAcercaDe.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

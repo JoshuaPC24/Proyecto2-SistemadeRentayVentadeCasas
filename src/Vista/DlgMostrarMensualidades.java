@@ -12,31 +12,29 @@ import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * Ventana que muestra las mensualidades de un mes y año.
- *
- * La ventana de mensualidades le envía el periodo con el método
- * cargarPeriodo.
  *
  * @author mauri
  */
 public class DlgMostrarMensualidades extends javax.swing.JDialog {
 
-    /**
-     * Nombres de los meses para mostrarlos en pantalla.
-     */
+    //Nombres de los meses para mostrarlos en pantalla
     private final String[] nombresMeses = {
         "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
         "Julio", "Agosto", "Setiembre", "Octubre",
         "Noviembre", "Diciembre"
     };
 
+    MensualidadStore listaMensualidades;
+
     /**
      * Creates new form DlgMostrarMensualidades
      */
-    public DlgMostrarMensualidades(java.awt.Frame parent, boolean modal) {
+    public DlgMostrarMensualidades(java.awt.Frame parent, boolean modal,
+            MensualidadStore listaMensualidades) {
 
         super(parent, modal);
         initComponents();
+        this.listaMensualidades = listaMensualidades;
 
         // La tabla viene con filas vacías desde el diseñador
         DefaultTableModel modelo =
@@ -45,14 +43,8 @@ public class DlgMostrarMensualidades extends javax.swing.JDialog {
         modelo.setRowCount(0);
     }
 
-    /**
-     * Carga en la tabla las mensualidades del mes y año recibidos.
-     *
-     * Si el mes viene en 0 se muestran todos los meses de ese año.
-     *
-     * @param mes número del mes (1 al 12) o 0 para todos
-     * @param anio año de 4 dígitos
-     */
+    //Carga en la tabla las mensualidades del mes y año recibidos
+    //Si el mes viene en 0 se muestran todos los meses de ese año
     public void cargarPeriodo(int mes, int anio) {
 
         if (mes == 0) {
@@ -64,7 +56,7 @@ public class DlgMostrarMensualidades extends javax.swing.JDialog {
         lblAnio.setText(String.valueOf(anio));
 
         ArrayList<Mensualidades> lista =
-                MensualidadStore.filtrar("", mes, anio);
+                listaMensualidades.filtrar("", mes, anio);
 
         DefaultTableModel modelo =
                 (DefaultTableModel) tblMensualidadesPeriodo.getModel();
@@ -73,38 +65,22 @@ public class DlgMostrarMensualidades extends javax.swing.JDialog {
 
         double totalMonto = 0;
 
-        for (int i = 0; i < lista.size(); i++) {
+        for (Mensualidades m : lista) {
 
-            Mensualidades mensualidad = lista.get(i);
+            modelo.addRow(new Object[]{
+                m.getConsecutivo(), m.getAlquiler().getNumAlquiler(),
+                formatearFecha(m.getFechCreacion()), m.getNomInquilino(),
+                m.getDescuento(), m.getMontoMes(), m.getEstado()
+            });
 
-            int numeroAlquiler = 0;
-
-            if (mensualidad.getAlquiler() != null) {
-                numeroAlquiler =
-                        mensualidad.getAlquiler().getNumAlquiler();
-            }
-
-            Object[] fila = new Object[7];
-            fila[0] = mensualidad.getConsecutivo();
-            fila[1] = numeroAlquiler;
-            fila[2] = formatearFecha(mensualidad.getFechCreacion());
-            fila[3] = mensualidad.getNomInquilino();
-            fila[4] = mensualidad.getDescuento();
-            fila[5] = mensualidad.getMontoMes();
-            fila[6] = mensualidad.getEstado();
-
-            modelo.addRow(fila);
-
-            totalMonto = totalMonto + mensualidad.getMontoMes();
+            totalMonto = totalMonto + m.getMontoMes();
         }
 
         jLabel10.setText(String.valueOf(lista.size()));
         jLabel12.setText(String.valueOf(totalMonto));
     }
 
-    /**
-     * Convierte una fecha al formato dd/MM/yyyy para mostrarla.
-     */
+    //Convierte una fecha al formato dd/MM/yyyy para mostrarla
     private String formatearFecha(LocalDate fecha) {
 
         if (fecha == null) {
@@ -355,7 +331,8 @@ public class DlgMostrarMensualidades extends javax.swing.JDialog {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                DlgMostrarMensualidades dialog = new DlgMostrarMensualidades(new javax.swing.JFrame(), true);
+                DlgMostrarMensualidades dialog = new DlgMostrarMensualidades(new javax.swing.JFrame(), true,
+                        new MensualidadStore());
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

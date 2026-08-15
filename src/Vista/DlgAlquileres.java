@@ -16,58 +16,30 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * Ventana con el listado de alquileres.
- *
- * Permite buscar, agregar, editar y eliminar alquileres del
- * ArrayList que se encuentra en AlquilerStore.
  *
  * @author mauri
  */
 public class DlgAlquileres extends javax.swing.JDialog {
 
+    AlquilerStore listaAlquileres;
+    InquilinoStore listaInquilinos;
+    ViviendaStore listaViviendas;
+    MensualidadStore listaMensualidades;
+
     /**
      * Creates new form DlgAlquileres
      */
-    public DlgAlquileres(java.awt.Frame parent, boolean modal) {
+    public DlgAlquileres(java.awt.Frame parent, boolean modal,
+            AlquilerStore listaAlquileres, InquilinoStore listaInquilinos,
+            ViviendaStore listaViviendas, MensualidadStore listaMensualidades) {
 
         super(parent, modal);
         initComponents();
 
-        // Estos botones no tienen evento creado en el diseñador,
-        // por eso aquí se les conecta su código.
-        conectarBotones();
-
-        cargarTabla();
-    }
-
-    /**
-     * Conecta los botones Nuevo, Editar, Eliminar y Cerrar con su evento.
-     */
-    private void conectarBotones() {
-
-        btnNuevo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNuevoActionPerformed(evt);
-            }
-        });
-
-        btnEditar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditarActionPerformed(evt);
-            }
-        });
-
-        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEliminarActionPerformed(evt);
-            }
-        });
-
-        btnCerrar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCerrarActionPerformed(evt);
-            }
-        });
+        this.listaAlquileres = listaAlquileres;
+        this.listaInquilinos = listaInquilinos;
+        this.listaViviendas = listaViviendas;
+        this.listaMensualidades = listaMensualidades;
     }
 
     /**
@@ -99,6 +71,11 @@ public class DlgAlquileres extends javax.swing.JDialog {
         btnCerrar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+        });
 
         jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
@@ -147,6 +124,11 @@ public class DlgAlquileres extends javax.swing.JDialog {
                 txtBuscarActionPerformed(evt);
             }
         });
+        txtBuscar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtBuscarKeyReleased(evt);
+            }
+        });
 
         btnBuscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Buscar.png"))); // NOI18N
         btnBuscar.setText("Buscar");
@@ -188,15 +170,35 @@ public class DlgAlquileres extends javax.swing.JDialog {
 
         btnNuevo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/AgregarViviendas.png"))); // NOI18N
         btnNuevo.setText("Nuevo");
+        btnNuevo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNuevoActionPerformed(evt);
+            }
+        });
 
         btnEditar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Editar.png"))); // NOI18N
         btnEditar.setText("Editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
 
         btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Eliminar.png"))); // NOI18N
         btnEliminar.setText("Eliminar");
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
 
         btnCerrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/cerrar.png"))); // NOI18N
         btnCerrar.setText("Cerrar");
+        btnCerrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCerrarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -308,15 +310,22 @@ public class DlgAlquileres extends javax.swing.JDialog {
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
 
-        String texto = txtBuscar.getText().trim();
+        String texto = txtBuscar.getText().trim().toLowerCase();
 
         if (texto.equals("")) {
             cargarTabla();
             return;
         }
 
-        ArrayList<Alquileres> encontrados =
-                AlquilerStore.buscarPorTexto(texto);
+        ArrayList<Alquileres> encontrados = new ArrayList();
+
+        for (Alquileres a : listaAlquileres.getListaAlquileres()) {
+            if (String.valueOf(a.getNumAlquiler()).contains(texto)
+                    || a.getInquilino().getNomInqui().toLowerCase().contains(texto)
+                    || a.getVivienda().getDescripcion().toLowerCase().contains(texto)) {
+                encontrados.add(a);
+            }
+        }
 
         if (encontrados.isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -331,123 +340,115 @@ public class DlgAlquileres extends javax.swing.JDialog {
         cargarTabla();
     }//GEN-LAST:event_btnMostrarTodoActionPerformed
 
-    private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {
+    private void txtBuscarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarKeyReleased
+        btnBuscarActionPerformed(null);
+    }//GEN-LAST:event_txtBuscarKeyReleased
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        cargarTabla();
+    }//GEN-LAST:event_formWindowActivated
+
+    private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
 
         // Para crear un alquiler tiene que existir el inquilino
         // y tiene que haber al menos una vivienda disponible
-        if (InquilinoStore.estaVacio()) {
+        if (listaInquilinos.getListaInquilinos().isEmpty()) {
 
             JOptionPane.showMessageDialog(this,
                     "Primero debe registrar al menos un inquilino.");
             return;
         }
 
-        if (ViviendaStore.obtenerDisponibles().isEmpty()) {
+        if (listaViviendas.listaDisponibles().isEmpty()) {
 
             JOptionPane.showMessageDialog(this,
                     "No hay viviendas disponibles para alquilar.");
             return;
         }
 
-        DlgNuevoAlquiler ventana =
-                new DlgNuevoAlquiler((java.awt.Frame) getOwner(), true);
+        DlgNuevoAlquiler ventana = new DlgNuevoAlquiler(
+                (java.awt.Frame) getOwner(), true,
+                listaAlquileres, listaInquilinos, listaViviendas);
 
         ventana.setLocationRelativeTo(this);
         ventana.setVisible(true);
+    }//GEN-LAST:event_btnNuevoActionPerformed
 
-        cargarTabla();
-    }
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
 
-    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {
+        if (tblAlquileres.getSelectedRowCount() == 1) {
 
-        int fila = tblAlquileres.getSelectedRow();
+            int fila = tblAlquileres.getSelectedRow();
 
-        if (fila == -1) {
+            int numero = Integer.parseInt(
+                    tblAlquileres.getValueAt(fila, 0).toString());
+
+            Alquileres alquiler = listaAlquileres.buscarNumero(numero);
+            int pos = listaAlquileres.getListaAlquileres().indexOf(alquiler);
+
+            DlgNuevoAlquiler ventana = new DlgNuevoAlquiler(
+                    (java.awt.Frame) getOwner(), true,
+                    listaAlquileres, listaInquilinos, listaViviendas, alquiler, pos);
+
+            ventana.setLocationRelativeTo(this);
+            ventana.setVisible(true);
+
+        } else {
             JOptionPane.showMessageDialog(this,
-                    "Seleccione en la tabla el alquiler que desea editar.");
-            return;
+                    "Debe seleccionar 1 Alquiler");
         }
+    }//GEN-LAST:event_btnEditarActionPerformed
 
-        int numero = Integer.parseInt(
-                tblAlquileres.getValueAt(fila, 0).toString());
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
 
-        Alquileres alquiler = AlquilerStore.buscarPorNumero(numero);
+        if (tblAlquileres.getSelectedRowCount() == 1) {
 
-        if (alquiler == null) {
-            JOptionPane.showMessageDialog(this,
-                    "El alquiler ya no existe en el sistema.");
-            cargarTabla();
-            return;
-        }
+            int fila = tblAlquileres.getSelectedRow();
 
-        DlgNuevoAlquiler ventana =
-                new DlgNuevoAlquiler((java.awt.Frame) getOwner(), true);
+            int numero = Integer.parseInt(
+                    tblAlquileres.getValueAt(fila, 0).toString());
 
-        ventana.cargarAlquiler(alquiler);
-        ventana.setLocationRelativeTo(this);
-        ventana.setVisible(true);
+            // Un alquiler con mensualidades generadas no se puede borrar
+            if (listaMensualidades.alquilerTieneMensualidad(numero)) {
 
-        cargarTabla();
-    }
+                JOptionPane.showMessageDialog(this,
+                        "No se puede eliminar: el alquiler ya tiene "
+                        + "mensualidades generadas.");
+                return;
+            }
 
-    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {
+            int respuesta = JOptionPane.showConfirmDialog(this,
+                    "¿Seguro que desea eliminar este alquiler?\n"
+                    + "La vivienda volverá a quedar disponible.",
+                    "Eliminar",
+                    JOptionPane.YES_NO_OPTION);
 
-        int fila = tblAlquileres.getSelectedRow();
+            if (respuesta == JOptionPane.YES_OPTION) {
 
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(this,
-                    "Seleccione en la tabla el alquiler que desea eliminar.");
-            return;
-        }
-
-        int numero = Integer.parseInt(
-                tblAlquileres.getValueAt(fila, 0).toString());
-
-        // Un alquiler con mensualidades generadas no se puede borrar
-        if (!MensualidadStore.buscarPorAlquiler(numero).isEmpty()) {
-
-            JOptionPane.showMessageDialog(this,
-                    "No se puede eliminar: el alquiler ya tiene "
-                    + "mensualidades generadas.");
-            return;
-        }
-
-        int respuesta = JOptionPane.showConfirmDialog(this,
-                "¿Seguro que desea eliminar este alquiler?\n"
-                + "La vivienda volverá a quedar disponible.",
-                "Eliminar",
-                JOptionPane.YES_NO_OPTION);
-
-        if (respuesta == JOptionPane.YES_OPTION) {
-
-            if (AlquilerStore.eliminarPorNumero(numero)) {
+                Alquileres alquiler = listaAlquileres.buscarNumero(numero);
+                listaAlquileres.eliminarAlquiler(alquiler);
 
                 JOptionPane.showMessageDialog(this,
                         "Alquiler eliminado correctamente.");
                 cargarTabla();
-
-            } else {
-
-                JOptionPane.showMessageDialog(this,
-                        "No se pudo eliminar el alquiler.");
             }
+
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Debe seleccionar 1 Alquiler");
         }
-    }
+    }//GEN-LAST:event_btnEliminarActionPerformed
 
-    private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarActionPerformed
         dispose();
-    }
+    }//GEN-LAST:event_btnCerrarActionPerformed
 
-    /**
-     * Muestra en la tabla todos los alquileres del ArrayList.
-     */
+    //Muestra en la tabla todos los alquileres del ArrayList
     public void cargarTabla() {
-        llenarTabla(AlquilerStore.getListaAlquileres());
+        llenarTabla(listaAlquileres.getListaAlquileres());
     }
 
-    /**
-     * Pasa la lista de alquileres recibida a la tabla.
-     */
+    //Pasa la lista de alquileres recibida a la tabla
     private void llenarTabla(ArrayList<Alquileres> lista) {
 
         DefaultTableModel modelo =
@@ -455,42 +456,19 @@ public class DlgAlquileres extends javax.swing.JDialog {
 
         modelo.setRowCount(0);
 
-        for (int i = 0; i < lista.size(); i++) {
-
-            Alquileres alquiler = lista.get(i);
-
-            String nombreInquilino = "Sin inquilino";
-
-            if (alquiler.getInquilino() != null) {
-                nombreInquilino = alquiler.getInquilino().getNomInqui();
-            }
-
-            String descripcionVivienda = "Sin vivienda";
-
-            if (alquiler.getVivienda() != null) {
-                descripcionVivienda =
-                        alquiler.getVivienda().getDescripcion();
-            }
-
-            Object[] fila = new Object[7];
-            fila[0] = alquiler.getNumAlquiler();
-            fila[1] = formatearFecha(alquiler.getFechContrato());
-            fila[2] = nombreInquilino;
-            fila[3] = descripcionVivienda;
-            fila[4] = alquiler.getCantMeses();
-            fila[5] = alquiler.getPrecioAlquiler();
-            fila[6] = alquiler.getEstado();
-
-            modelo.addRow(fila);
+        for (Alquileres a : lista) {
+            modelo.addRow(new Object[]{
+                a.getNumAlquiler(), formatearFecha(a.getFechContrato()),
+                a.getInquilino().getNomInqui(), a.getVivienda().getDescripcion(),
+                a.getCantMeses(), a.getPrecioAlquiler(), a.getEstado()
+            });
         }
 
         txtAlquileresRegistrados.setText(
-                String.valueOf(AlquilerStore.cantidad()));
+                String.valueOf(listaAlquileres.cantidad()));
     }
 
-    /**
-     * Convierte una fecha al formato dd/MM/yyyy para mostrarla.
-     */
+    //Convierte una fecha al formato dd/MM/yyyy para mostrarla
     private String formatearFecha(LocalDate fecha) {
 
         if (fecha == null) {
@@ -533,7 +511,9 @@ public class DlgAlquileres extends javax.swing.JDialog {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                DlgAlquileres dialog = new DlgAlquileres(new javax.swing.JFrame(), true);
+                DlgAlquileres dialog = new DlgAlquileres(new javax.swing.JFrame(), true,
+                        new AlquilerStore(), new InquilinoStore(),
+                        new ViviendaStore(), new MensualidadStore());
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
