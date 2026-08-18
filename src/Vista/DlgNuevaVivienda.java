@@ -134,11 +134,11 @@ public class DlgNuevaVivienda extends javax.swing.JDialog {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        jLabel9.setText("Registro de la Nueva Vivienda");
         jLabel9.setFont(new java.awt.Font("Segoe UI Black", 1, 18)); // NOI18N
+        jLabel9.setText("Registro de la Nueva Vivienda");
 
-        jLabel10.setText("Complete la Información de la Vivienda");
         jLabel10.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
+        jLabel10.setText("Complete la Información de la Vivienda");
 
         jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Vivienda.png"))); // NOI18N
 
@@ -168,8 +168,8 @@ public class DlgNuevaVivienda extends javax.swing.JDialog {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos de la Vivienda", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
 
-        jLabel1.setText("ID Vivienda:");
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel1.setText("ID Vivienda:");
 
         txtIdVivienda.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -177,20 +177,20 @@ public class DlgNuevaVivienda extends javax.swing.JDialog {
             }
         });
 
-        jLabel2.setText("Descripción:");
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel2.setText("Descripción:");
 
-        jLabel3.setText("Dirección:");
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel3.setText("Dirección:");
 
-        jLabel4.setText("Metros de Lote:");
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel4.setText("Metros de Lote:");
 
-        jLabel5.setText("Tipo de Construcción");
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel5.setText("Tipo de Construcción");
 
-        jLabel6.setText("Cantidad de Habitaciones:");
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel6.setText("Cantidad de Habitaciones:");
 
         btnGuardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Guardar.png"))); // NOI18N
         btnGuardar.setText("Guardar");
@@ -208,37 +208,37 @@ public class DlgNuevaVivienda extends javax.swing.JDialog {
             }
         });
 
-        jLabel7.setText("Metodos de Construccion:");
+        jLabel7.setText("Metros de Construccion:");
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
-        jLabel8.setText("Cantidad de Baños:");
         jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel8.setText("Cantidad de Baños:");
 
         cmbTipoConstruccion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione", "Block", "Baldosa", "SuperBlock", "Madera", "Mixta" }));
 
-        jLabel12.setText("¿Tiene Cochera?");
         jLabel12.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel12.setText("¿Tiene Cochera?");
 
         chkCochera.setText("Si, Tiene Cochera");
 
-        jLabel13.setText("Tipo de Carretera:");
         jLabel13.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel13.setText("Tipo de Carretera:");
 
         cmbTipoCarretera.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione", "Lastre", "Pavimentada", "Adoquinada" }));
 
-        jLabel14.setText("Precio Base del Alquiler:");
         jLabel14.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel14.setText("Precio Base del Alquiler:");
 
-        jLabel15.setText("Deposito de Garantia:");
         jLabel15.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel15.setText("Deposito de Garantia:");
 
-        jLabel16.setText("Seleccione el Propietario:");
         jLabel16.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel16.setText("Seleccione el Propietario:");
 
         cmbPropietario.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione" }));
 
-        jLabel17.setText("Estado:");
         jLabel17.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel17.setText("Estado:");
 
         cmbEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione", "Disponible", "Alquilada", "Inactiva" }));
         cmbEstado.addActionListener(new java.awt.event.ActionListener() {
