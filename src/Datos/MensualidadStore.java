@@ -7,6 +7,11 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 
 /**
+ * Guarda y administra el ArrayList de mensualidades del sistema.
+ *
+ * Se encarga de generar automáticamente las mensualidades de los
+ * alquileres vigentes, aplicando el descuento según la temporada
+ * y evitando que se dupliquen.
  *
  * @author mauri
  */
@@ -27,12 +32,21 @@ public class MensualidadStore {
     }
 
     //Métodos del CRUD
+
+    /**
+     * Agrega una mensualidad nueva al ArrayList.
+     */
     public void insertarMensualidad(Mensualidades mensualidad) {
         if (this.listaMensualidades != null) {
             this.listaMensualidades.add(mensualidad);
         }
     }
 
+    /**
+     * Busca una mensualidad por su consecutivo.
+     *
+     * @return la mensualidad encontrada o null si no existe
+     */
     public Mensualidades buscarConsecutivo(int consecutivo) {
         for (Mensualidades m : listaMensualidades) {
             if (m.getConsecutivo() == consecutivo) {
@@ -42,7 +56,9 @@ public class MensualidadStore {
         return null;
     }
 
-    //Genera el siguiente consecutivo disponible
+    /**
+     * Genera el siguiente consecutivo disponible.
+     */
     public int generarConsecutivo() {
         int mayor = 0;
 
@@ -54,7 +70,11 @@ public class MensualidadStore {
         return mayor + 1;
     }
 
-    //Un mismo alquiler solo puede tener 1 mensualidad por mes/año
+    /**
+     * Revisa si ya existe una mensualidad para ese alquiler en ese
+     * mes y año. Un mismo alquiler solo puede tener 1 mensualidad
+     * por mes/año.
+     */
     public boolean existeMensualidad(int numAlquiler, int mes, int anio) {
         for (Mensualidades m : listaMensualidades) {
             if (m.getAlquiler().getNumAlquiler() == numAlquiler
@@ -67,7 +87,10 @@ public class MensualidadStore {
         return false;
     }
 
-    //Se usa para no permitir eliminar un alquiler con mensualidades
+    /**
+     * Revisa si un alquiler tiene alguna mensualidad generada.
+     * Se usa para no permitir eliminar un alquiler con mensualidades.
+     */
     public boolean alquilerTieneMensualidad(int numAlquiler) {
         for (Mensualidades m : listaMensualidades) {
             if (m.getAlquiler().getNumAlquiler() == numAlquiler) {
@@ -78,8 +101,16 @@ public class MensualidadStore {
     }
 
     /**
-     * Genera una mensualidad por cada alquiler vigente que esté activo
-     * en el mes y año indicados. Retorna la cantidad generada.
+     * Genera una mensualidad por cada alquiler vigente que esté
+     * activo en el mes y año indicados, aplicando el descuento
+     * según la temporada. No genera mensualidades repetidas ni
+     * para un periodo anterior al mes actual.
+     *
+     * @param mes mes a generar (1 al 12)
+     * @param anio año a generar
+     * @param vigentes alquileres con estado Vigente
+     * @return la cantidad de mensualidades generadas, o -1 si el
+     *         periodo no es válido
      */
     public int generarMensualidades(int mes, int anio, ArrayList<Alquileres> vigentes) {
 
@@ -116,7 +147,10 @@ public class MensualidadStore {
         return cantidadGenerada;
     }
 
-    //No se permiten periodos anteriores al mes actual
+    /**
+     * Revisa que el periodo sea válido para generar mensualidades.
+     * No se permiten periodos anteriores al mes actual.
+     */
     public boolean periodoValido(int mes, int anio) {
 
         if (mes < 1 || mes > 12) {
@@ -129,7 +163,10 @@ public class MensualidadStore {
         return !periodoSolicitado.isBefore(periodoActual);
     }
 
-    //Revisa si el contrato del alquiler cubre ese mes y año
+    /**
+     * Revisa si el contrato del alquiler cubre ese mes y año,
+     * según su fecha de contrato y su cantidad de meses.
+     */
     public boolean alquilerActivoEnPeriodo(Alquileres alquiler, int mes, int anio) {
 
         YearMonth periodoSolicitado = YearMonth.of(anio, mes);
@@ -141,7 +178,8 @@ public class MensualidadStore {
     }
 
     /**
-     * Descuento según la temporada.
+     * Retorna el porcentaje de descuento según la temporada del mes.
+     *
      * Baja: agosto, setiembre, octubre = 10%
      * Media: marzo, abril, mayo, junio, julio = 5%
      * Alta: noviembre, diciembre, enero, febrero = 0%
@@ -166,6 +204,9 @@ public class MensualidadStore {
         }
     }
 
+    /**
+     * Retorna todas las mensualidades de un mes y año.
+     */
     public ArrayList<Mensualidades> buscarPorPeriodo(int mes, int anio) {
         ArrayList<Mensualidades> resultado = new ArrayList();
 
@@ -177,7 +218,11 @@ public class MensualidadStore {
         return resultado;
     }
 
-    //Filtro combinado por inquilino, mes y año para la pantalla de mostrar
+    /**
+     * Filtra las mensualidades por nombre de inquilino, mes y año
+     * al mismo tiempo. Si un valor viene vacío o en 0, no filtra
+     * por ese criterio.
+     */
     public ArrayList<Mensualidades> filtrar(String nombreInquilino, int mes, int anio) {
         ArrayList<Mensualidades> resultado = new ArrayList();
         String busqueda = nombreInquilino == null ? "" : nombreInquilino.trim().toLowerCase();
@@ -197,6 +242,9 @@ public class MensualidadStore {
         return resultado;
     }
 
+    /**
+     * Retorna la cantidad de mensualidades registradas.
+     */
     public int cantidad() {
         return listaMensualidades.size();
     }

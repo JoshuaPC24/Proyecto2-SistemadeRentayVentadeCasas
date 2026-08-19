@@ -5,6 +5,10 @@ import Logica.Vivienda;
 import java.util.ArrayList;
 
 /**
+ * Guarda y administra el ArrayList de alquileres del sistema.
+ *
+ * Al insertar, editar o eliminar un alquiler también actualiza
+ * el estado de la vivienda relacionada.
  *
  * @author mauri
  */
@@ -25,6 +29,12 @@ public class AlquilerStore {
     }
 
     //Métodos del CRUD
+
+    /**
+     * Agrega un alquiler nuevo al ArrayList.
+     *
+     * Si el alquiler queda vigente, la vivienda pasa a Alquilada.
+     */
     public void insertarAlquiler(Alquileres alquiler) {
         if (this.listaAlquileres != null) {
             this.listaAlquileres.add(alquiler);
@@ -36,6 +46,10 @@ public class AlquilerStore {
         }
     }
 
+    /**
+     * Reemplaza el alquiler que está en la posición index y
+     * actualiza el estado de las viviendas involucradas.
+     */
     public void editarAlquiler(int index, Alquileres nuevo) {
         if (index >= 0 && nuevo != null && !listaAlquileres.isEmpty()) {
 
@@ -56,6 +70,12 @@ public class AlquilerStore {
         }
     }
 
+    /**
+     * Elimina un alquiler del ArrayList y libera la vivienda
+     * (vuelve a quedar Disponible).
+     *
+     * @return true si se pudo eliminar, false si no existía
+     */
     public boolean eliminarAlquiler(Alquileres alquiler) {
         if (this.listaAlquileres.contains(alquiler)) {
 
@@ -66,6 +86,11 @@ public class AlquilerStore {
         return false;  // El alquiler no existe en el ArrayList
     }
 
+    /**
+     * Busca un alquiler por su número.
+     *
+     * @return el alquiler encontrado o null si no existe
+     */
     public Alquileres buscarNumero(int numAlquiler) {
         for (Alquileres a : listaAlquileres) {
             if (a.getNumAlquiler() == numAlquiler) {
@@ -75,7 +100,9 @@ public class AlquilerStore {
         return null;
     }
 
-    //Genera el siguiente número consecutivo de alquiler
+    /**
+     * Genera el siguiente número consecutivo de alquiler.
+     */
     public int generarNumero() {
         int mayor = 0;
 
@@ -87,6 +114,9 @@ public class AlquilerStore {
         return mayor + 1;
     }
 
+    /**
+     * Retorna los alquileres con estado Vigente.
+     */
     public ArrayList<Alquileres> listaVigentes() {
         ArrayList<Alquileres> vigentes = new ArrayList();
 
@@ -98,7 +128,10 @@ public class AlquilerStore {
         return vigentes;
     }
 
-    //Se usa para no permitir eliminar un inquilino con alquileres
+    /**
+     * Revisa si un inquilino tiene algún alquiler registrado.
+     * Se usa para no permitir eliminar un inquilino con alquileres.
+     */
     public boolean inquilinoTieneAlquiler(int cedInquilino) {
         for (Alquileres a : listaAlquileres) {
             if (a.getInquilino().getCedInqui() == cedInquilino) {
@@ -108,7 +141,10 @@ public class AlquilerStore {
         return false;
     }
 
-    //Se usa para no permitir eliminar una vivienda con alquileres
+    /**
+     * Revisa si una vivienda tiene algún alquiler registrado.
+     * Se usa para no permitir eliminar una vivienda con alquileres.
+     */
     public boolean viviendaTieneAlquiler(int idVivienda) {
         for (Alquileres a : listaAlquileres) {
             if (a.getVivienda().getIdVivienda() == idVivienda) {
@@ -118,6 +154,9 @@ public class AlquilerStore {
         return false;
     }
 
+    /**
+     * Retorna la cantidad de alquileres registrados.
+     */
     public int cantidad() {
         return listaAlquileres.size();
     }

@@ -4,6 +4,7 @@ import Logica.Propietario;
 import java.util.ArrayList;
 
 /**
+ * Guarda y administra el ArrayList de propietarios del sistema.
  *
  * @author mauri
  */
@@ -24,18 +25,30 @@ public class PropietarioStore {
     }
 
     //Métodos del CRUD
+
+    /**
+     * Agrega un propietario nuevo al ArrayList.
+     */
     public void insertarPropietario(Propietario propietario) {
         if (this.listaPropietarios != null) {
             this.listaPropietarios.add(propietario);
         }
     }
 
+    /**
+     * Reemplaza el propietario que está en la posición index.
+     */
     public void editarPropietario(int index, Propietario nuevo) {
         if (index >= 0 && nuevo != null && !listaPropietarios.isEmpty()) {
             this.listaPropietarios.set(index, nuevo);
         }
     }
 
+    /**
+     * Elimina un propietario del ArrayList.
+     *
+     * @return true si se pudo eliminar, false si no existía
+     */
     public boolean eliminarPropietario(Propietario propietario) {
         if (this.listaPropietarios.contains(propietario)) {
             this.listaPropietarios.remove(propietario);
@@ -44,6 +57,11 @@ public class PropietarioStore {
         return false;  // El propietario no existe en el ArrayList
     }
 
+    /**
+     * Busca un propietario por su cédula.
+     *
+     * @return el propietario encontrado o null si no existe
+     */
     public Propietario buscarCedula(int cedula) {
         for (Propietario p : listaPropietarios) {
             if (p.getCedPropiet() == cedula) {
@@ -53,6 +71,9 @@ public class PropietarioStore {
         return null;
     }
 
+    /**
+     * Retorna la cantidad de propietarios registrados.
+     */
     public int cantidad() {
         return listaPropietarios.size();
     }

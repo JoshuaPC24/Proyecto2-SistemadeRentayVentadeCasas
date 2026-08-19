@@ -28,7 +28,13 @@ public class Alquileres {
     public Alquileres() {
     }
 
-    // Constructor con todos los atributos
+    /**
+     * Crea un alquiler con todos sus datos.
+     *
+     * @param numAlquiler número consecutivo del alquiler, es único
+     * @param inquilino inquilino que arrienda, debe existir previamente
+     * @param vivienda vivienda alquilada, debe existir previamente
+     */
     public Alquileres(int numAlquiler, LocalDate fechContrato,
                       int cantMeses, int numAdultos, int numNinos,
                       double depositoGarantia, double precioAlquiler,

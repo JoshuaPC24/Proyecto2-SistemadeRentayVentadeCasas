@@ -14,6 +14,8 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
+ * Ventana con el listado de inquilinos.
+ * Permite buscar, agregar, editar y eliminar inquilinos.
  *
  * @author mauri
  */

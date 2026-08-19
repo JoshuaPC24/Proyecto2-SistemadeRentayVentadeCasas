@@ -14,6 +14,8 @@ import java.time.LocalDate;
 import javax.swing.JOptionPane;
 
 /**
+ * Ventana para registrar un alquiler nuevo o editar uno
+ * existente en el ArrayList de alquileres.
  *
  * @author mauri
  */

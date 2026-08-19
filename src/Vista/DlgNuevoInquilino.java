@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import javax.swing.JOptionPane;
 
 /**
+ * Ventana para registrar un inquilino nuevo o editar uno
+ * existente en el ArrayList de inquilinos.
  *
  * @author mauri
  */

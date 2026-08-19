@@ -29,7 +29,12 @@ public class Vivienda {
     public Vivienda() {
     }
 
-    // Constructor con todos los atributos
+    /**
+     * Crea una vivienda con todos sus datos.
+     *
+     * @param idVivienda identificador de la vivienda, es único
+     * @param propietario dueño de la vivienda, debe existir previamente
+     */
     public Vivienda(int idVivienda, String descripcion, String direccion,
                     double mtsConstruct, double mtsLote,
                     String tipoConstruccion, boolean cochera,

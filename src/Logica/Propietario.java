@@ -19,7 +19,11 @@ public class Propietario {
     public Propietario() {
     }
 
-    // Constructor con todos los atributos
+    /**
+     * Crea un propietario con todos sus datos.
+     *
+     * @param cedPropiet cédula del propietario, es única
+     */
     public Propietario(int cedPropiet, String nomPropiet, String genero,
                        String direccion, String telefono, String email) {
         this.cedPropiet = cedPropiet;

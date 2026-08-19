@@ -16,6 +16,9 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
+ * Ventana del módulo de ganancias. GuanaRent gana la mitad del
+ * depósito de garantía de cada alquiler y un 5% de cada
+ * mensualidad de los alquileres vigentes, por mes o por año.
  *
  * @author mauri
  */
@@ -323,6 +326,10 @@ public class DlgGanancias extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Calcula y muestra la ganancia del periodo elegido (por mes
+     * o por año), sumando depósitos y mensualidades.
+     */
     private void btnCalcularGananciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCalcularGananciasActionPerformed
 
         if (!rdoPorMes.isSelected() && !rdoPorAnio.isSelected()) {
@@ -360,7 +367,13 @@ public class DlgGanancias extends javax.swing.JDialog {
         cargarTablaDepositos(mes, anio);
     }//GEN-LAST:event_btnCalcularGananciasActionPerformed
 
-    //Suma la mitad del depósito de garantía de cada alquiler del periodo
+    /**
+     * Calcula la ganancia por depósitos: la mitad del depósito de
+     * garantía de cada alquiler firmado en el periodo consultado.
+     *
+     * @param mes mes a consultar, o 0 para todo el año
+     * @param anio año a consultar
+     */
     private double calcularGananciaDepositos(int mes, int anio) {
 
         double ganancia = 0;
@@ -374,8 +387,14 @@ public class DlgGanancias extends javax.swing.JDialog {
         return ganancia;
     }
 
-    //Suma el 5% de cada mensualidad del periodo consultado
-    //Solo cuenta las mensualidades de alquileres vigentes
+    /**
+     * Calcula la ganancia por mensualidades: el 5% de cada
+     * mensualidad del periodo consultado, solo de los alquileres
+     * que estén vigentes.
+     *
+     * @param mes mes a consultar, o 0 para todo el año
+     * @param anio año a consultar
+     */
     private double calcularGananciaMensualidades(int mes, int anio) {
 
         double ganancia = 0;

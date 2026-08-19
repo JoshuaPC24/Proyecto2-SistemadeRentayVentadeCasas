@@ -14,6 +14,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 /**
+ * Ventana principal del sistema. Desde aquí se abren los módulos
+ * de propietarios, inquilinos, viviendas, alquileres, mensualidades
+ * y ganancias, con los botones o con la barra de menú.
  *
  * @author mauri
  */

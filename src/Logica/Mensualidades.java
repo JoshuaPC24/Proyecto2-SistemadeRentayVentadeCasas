@@ -26,7 +26,12 @@ public class Mensualidades {
     public Mensualidades() {
     }
 
-    // Constructor con todos los atributos
+    /**
+     * Crea una mensualidad con todos sus datos.
+     *
+     * @param consecutivo identificador de la mensualidad, es único
+     * @param alquiler alquiler al que pertenece, debe existir previamente
+     */
     public Mensualidades(int consecutivo, Alquileres alquiler,
                          LocalDate fechCreacion, String nomInquilino,
                          int mesCobro, int anioActual, double descuento,

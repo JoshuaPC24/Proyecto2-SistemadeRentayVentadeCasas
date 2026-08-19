@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
 
 /**
+ * Ventana que muestra en una tabla las mensualidades generadas
+ * para el mes y año que se le indiquen.
  *
  * @author mauri
  */

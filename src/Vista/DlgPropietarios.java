@@ -12,6 +12,8 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
+ * Ventana con el listado de propietarios.
+ * Permite buscar, agregar, editar y eliminar propietarios.
  *
  * @author mauri
  */

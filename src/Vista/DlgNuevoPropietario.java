@@ -9,6 +9,8 @@ import Logica.Propietario;
 import javax.swing.JOptionPane;
 
 /**
+ * Ventana para registrar un propietario nuevo o editar uno
+ * existente en el ArrayList de propietarios.
  *
  * @author mauri
  */

@@ -23,7 +23,11 @@ public class Inquilino {
     public Inquilino() {
     }
 
-    // Constructor con todos los atributos
+    /**
+     * Crea un inquilino con todos sus datos.
+     *
+     * @param cedInqui cédula del inquilino, es única
+     */
     public Inquilino(int cedInqui, String nomInqui, String genero,
                      LocalDate fechNac, String direccion, String telefono,
                      String email, String ocupacion) {
