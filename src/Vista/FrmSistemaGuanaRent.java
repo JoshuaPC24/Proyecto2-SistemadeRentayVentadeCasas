@@ -19,6 +19,8 @@ import javax.swing.JOptionPane;
  * y ganancias, con los botones o con la barra de menú.
  *
  * @author mauri
+ * @author Joshua
+ * @author Alejandro
  */
 public class FrmSistemaGuanaRent extends javax.swing.JFrame {
 

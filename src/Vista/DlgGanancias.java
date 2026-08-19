@@ -21,6 +21,8 @@ import javax.swing.table.DefaultTableModel;
  * mensualidad de los alquileres vigentes, por mes o por año.
  *
  * @author mauri
+ * @author joshua
+ * @author alejandro
  */
 public class DlgGanancias extends javax.swing.JDialog {
 

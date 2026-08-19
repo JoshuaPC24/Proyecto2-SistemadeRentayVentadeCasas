@@ -21,6 +21,8 @@ import javax.swing.table.DefaultTableModel;
  * pueden mostrar o filtrar por inquilino, mes y año.
  *
  * @author mauri
+ * @author Joshua
+ * @author Alejandro
  */
 public class DlgMensualidades extends javax.swing.JDialog {
 

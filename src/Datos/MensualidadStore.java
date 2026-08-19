@@ -14,6 +14,8 @@ import java.util.ArrayList;
  * y evitando que se dupliquen.
  *
  * @author mauri
+ * @author Joshua
+ * @author Alejandro
  */
 public class MensualidadStore {
 

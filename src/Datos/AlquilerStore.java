@@ -11,6 +11,8 @@ import java.util.ArrayList;
  * el estado de la vivienda relacionada.
  *
  * @author mauri
+ * @author Joshua
+ * @author Alejandro
  */
 public class AlquilerStore {
 

@@ -14,6 +14,8 @@ import javax.swing.JOptionPane;
  * existente en el ArrayList de inquilinos.
  *
  * @author mauri
+ * @author Joshua
+ * @author Alejandro
  */
 public class DlgNuevoInquilino extends javax.swing.JDialog {
 

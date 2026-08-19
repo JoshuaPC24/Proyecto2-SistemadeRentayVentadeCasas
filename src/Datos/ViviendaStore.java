@@ -7,6 +7,8 @@ import java.util.ArrayList;
  * Guarda y administra el ArrayList de viviendas del sistema.
  *
  * @author mauri
+ * @author Joshua
+ * @author Alejandro
  */
 public class ViviendaStore {
 

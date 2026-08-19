@@ -16,6 +16,8 @@ import javax.swing.JOptionPane;
  * existente en el ArrayList de viviendas.
  *
  * @author mauri
+ * @author Joshua
+ * @author alejandro
  */
 public class DlgNuevaVivienda extends javax.swing.JDialog {
 

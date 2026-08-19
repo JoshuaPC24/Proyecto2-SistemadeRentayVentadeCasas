@@ -16,6 +16,8 @@ import javax.swing.table.DefaultTableModel;
  * para el mes y año que se le indiquen.
  *
  * @author mauri
+ * @author Joshua
+ * @author Alejandro
  */
 public class DlgMostrarMensualidades extends javax.swing.JDialog {
 

@@ -7,6 +7,8 @@ import java.util.ArrayList;
  * Guarda y administra el ArrayList de inquilinos del sistema.
  *
  * @author mauri
+ * @author Joshua
+ * @author Alejandro
  */
 public class InquilinoStore {
 

@@ -17,6 +17,8 @@ import javax.swing.table.DefaultTableModel;
  * Permite buscar, agregar, editar y eliminar viviendas.
  *
  * @author mauri
+ * @author Joshua
+ * @author Alejandro
  */
 public class DlgViviendas extends javax.swing.JDialog {
 

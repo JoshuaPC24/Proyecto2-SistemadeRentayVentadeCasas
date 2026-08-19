@@ -16,6 +16,8 @@ import javax.swing.table.DefaultTableModel;
  * Permite buscar, agregar, editar y eliminar propietarios.
  *
  * @author mauri
+ * @author Joshua
+ * @author Alejandro
  */
 public class DlgPropietarios extends javax.swing.JDialog {
 

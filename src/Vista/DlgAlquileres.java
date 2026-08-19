@@ -20,6 +20,8 @@ import javax.swing.table.DefaultTableModel;
  * Permite buscar, agregar, editar y eliminar alquileres.
  *
  * @author mauri
+ * @author Joshua
+ * @author Alejandro
  */
 public class DlgAlquileres extends javax.swing.JDialog {
 

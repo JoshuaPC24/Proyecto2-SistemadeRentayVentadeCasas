@@ -13,6 +13,8 @@ import javax.swing.JOptionPane;
  * existente en el ArrayList de propietarios.
  *
  * @author mauri
+ * @author Joshua
+ * @author Alejandro
  */
 public class DlgNuevoPropietario extends javax.swing.JFrame {
 
