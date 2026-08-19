@@ -375,6 +375,7 @@ public class DlgGanancias extends javax.swing.JDialog {
     }
 
     //Suma el 5% de cada mensualidad del periodo consultado
+    //Solo cuenta las mensualidades de alquileres vigentes
     private double calcularGananciaMensualidades(int mes, int anio) {
 
         double ganancia = 0;
@@ -383,7 +384,9 @@ public class DlgGanancias extends javax.swing.JDialog {
                 listaMensualidades.filtrar("", mes, anio);
 
         for (Mensualidades m : lista) {
-            ganancia = ganancia + m.getMontoMes() * 0.05;
+            if (m.getAlquiler().getEstado().equalsIgnoreCase("Vigente")) {
+                ganancia = ganancia + m.getMontoMes() * 0.05;
+            }
         }
 
         return ganancia;

@@ -122,6 +122,9 @@ public class DlgMensualidades extends javax.swing.JDialog {
         jLabel13 = new javax.swing.JLabel();
         txtTotalRegistros = new javax.swing.JTextField();
         btnCancelarMensu = new javax.swing.JButton();
+        chkFiltroInquilino = new javax.swing.JCheckBox();
+        chkFiltroMes = new javax.swing.JCheckBox();
+        chkFiltroAnio = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -335,23 +338,6 @@ public class DlgMensualidades extends javax.swing.JDialog {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmbFiltroInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel10)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmbMes, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtAnioMensualidad, javax.swing.GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnFiltrar)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnLimpiar)
-                        .addGap(16, 16, 16))
                     .addComponent(jScrollPane1)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                         .addComponent(jLabel12)
@@ -361,7 +347,31 @@ public class DlgMensualidades extends javax.swing.JDialog {
                         .addComponent(txtTotalRegistros, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnCancelarMensu, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
+                        .addContainerGap())
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(9, 9, 9)
+                        .addComponent(jLabel9)
+                        .addGap(2, 2, 2)
+                        .addComponent(chkFiltroInquilino)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmbFiltroInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel10)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkFiltroMes)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmbMes, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkFiltroAnio)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtAnioMensualidad, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnFiltrar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                        .addComponent(btnLimpiar)
+                        .addGap(32, 32, 32))))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -375,7 +385,16 @@ public class DlgMensualidades extends javax.swing.JDialog {
                     .addComponent(jLabel11)
                     .addComponent(txtAnioMensualidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnFiltrar)
-                    .addComponent(btnLimpiar))
+                    .addComponent(btnLimpiar)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(chkFiltroInquilino))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(9, 9, 9)
+                        .addComponent(chkFiltroMes))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(9, 9, 9)
+                        .addComponent(chkFiltroAnio)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -502,17 +521,22 @@ public class DlgMensualidades extends javax.swing.JDialog {
 
     private void btnFiltrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFiltrarActionPerformed
 
+        //Cada filtro solo se aplica si su checkbox está marcado
         String inquilino = "";
 
-        if (cmbFiltroInquilino.getSelectedIndex() > 0) {
+        if (chkFiltroInquilino.isSelected() && cmbFiltroInquilino.getSelectedIndex() > 0) {
             inquilino = cmbFiltroInquilino.getSelectedItem().toString();
         }
 
-        int mes = cmbMes.getSelectedIndex();
+        int mes = 0;
+
+        if (chkFiltroMes.isSelected()) {
+            mes = cmbMes.getSelectedIndex();
+        }
 
         int anio = 0;
 
-        if (!txtAnioMensualidad.getText().trim().equals("")) {
+        if (chkFiltroAnio.isSelected()) {
 
             anio = leerAnio(txtAnioMensualidad.getText());
 
@@ -534,6 +558,9 @@ public class DlgMensualidades extends javax.swing.JDialog {
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
 
+        chkFiltroInquilino.setSelected(false);
+        chkFiltroMes.setSelected(false);
+        chkFiltroAnio.setSelected(false);
         cmbFiltroInquilino.setSelectedIndex(0);
         cmbMes.setSelectedIndex(0);
         txtAnioMensualidad.setText("");
@@ -659,6 +686,9 @@ public class DlgMensualidades extends javax.swing.JDialog {
     private javax.swing.JButton btnGenerar;
     private javax.swing.JButton btnLimpiar;
     private javax.swing.JButton btnMostrarMensualidades;
+    private javax.swing.JCheckBox chkFiltroAnio;
+    private javax.swing.JCheckBox chkFiltroInquilino;
+    private javax.swing.JCheckBox chkFiltroMes;
     private javax.swing.JComboBox<String> cmbFiltroInquilino;
     private javax.swing.JComboBox<String> cmbGenerarMes;
     private javax.swing.JComboBox<String> cmbMes;

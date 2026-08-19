@@ -69,7 +69,6 @@ public class DlgNuevoInquilino extends javax.swing.JDialog {
         jLabel4 = new javax.swing.JLabel();
         txtDireccion = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        txtTelefono = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         txtCorreo = new javax.swing.JTextField();
         btnGuardar = new javax.swing.JButton();
@@ -78,6 +77,7 @@ public class DlgNuevoInquilino extends javax.swing.JDialog {
         jLabel8 = new javax.swing.JLabel();
         txtOcupacion = new javax.swing.JTextField();
         datePicker1 = new com.github.lgooddatepicker.components.DatePicker();
+        txtTelefono = new javax.swing.JFormattedTextField();
         jPanel1 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
@@ -87,25 +87,25 @@ public class DlgNuevoInquilino extends javax.swing.JDialog {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos del Inquilino", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel1.setText("Cédula:");
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel2.setText("Nombre:");
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel3.setText("Género:");
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
         cmbGenero.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Selecciones el Género", "Hombre", "Mujer" }));
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel4.setText("Dirección:");
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel5.setText("Teléfono:");
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel6.setText("Correo:");
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
         btnGuardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Guardar.png"))); // NOI18N
         btnGuardar.setText("Guardar");
@@ -123,11 +123,17 @@ public class DlgNuevoInquilino extends javax.swing.JDialog {
             }
         });
 
-        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel7.setText("Fecha de Nacimiento:");
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
-        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel8.setText("Ocupación:");
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+
+        try {
+            txtTelefono.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("########")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -160,12 +166,12 @@ public class DlgNuevoInquilino extends javax.swing.JDialog {
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(txtCorreo)
-                                    .addComponent(txtTelefono)
                                     .addComponent(txtDireccion)
                                     .addComponent(txtNombre)
                                     .addComponent(cmbGenero, 0, 175, Short.MAX_VALUE)
                                     .addComponent(txtCedula)
-                                    .addComponent(txtOcupacion))
+                                    .addComponent(txtOcupacion)
+                                    .addComponent(txtTelefono))
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
         );
         jPanel2Layout.setVerticalGroup(
@@ -212,11 +218,11 @@ public class DlgNuevoInquilino extends javax.swing.JDialog {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        jLabel9.setFont(new java.awt.Font("Segoe UI Black", 1, 18)); // NOI18N
         jLabel9.setText("Registro del Nuevo Inquilino");
+        jLabel9.setFont(new java.awt.Font("Segoe UI Black", 1, 18)); // NOI18N
 
-        jLabel10.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
         jLabel10.setText("Complete la Información del Inquilino");
+        jLabel10.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
 
         jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/Inquilino(2).png"))); // NOI18N
 
@@ -436,6 +442,6 @@ public class DlgNuevoInquilino extends javax.swing.JDialog {
     private javax.swing.JTextField txtDireccion;
     private javax.swing.JTextField txtNombre;
     private javax.swing.JTextField txtOcupacion;
-    private javax.swing.JTextField txtTelefono;
+    private javax.swing.JFormattedTextField txtTelefono;
     // End of variables declaration//GEN-END:variables
 }

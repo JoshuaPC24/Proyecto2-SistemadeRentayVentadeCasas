@@ -72,11 +72,11 @@ public class DlgNuevoPropietario extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         txtDireccion = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        txtTelefono = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         txtCorreo = new javax.swing.JTextField();
         btnGuardar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
+        txtTelefono = new javax.swing.JFormattedTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Nuevo Propietario");
@@ -155,6 +155,12 @@ public class DlgNuevoPropietario extends javax.swing.JFrame {
             }
         });
 
+        try {
+            txtTelefono.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("########")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -174,9 +180,9 @@ public class DlgNuevoPropietario extends javax.swing.JFrame {
                     .addComponent(txtNombre)
                     .addComponent(cmbGenero, 0, 175, Short.MAX_VALUE)
                     .addComponent(txtDireccion)
-                    .addComponent(txtTelefono)
                     .addComponent(txtCorreo)
-                    .addComponent(btnGuardar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnGuardar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtTelefono))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 140, Short.MAX_VALUE)
                 .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(76, 76, 76))
@@ -377,6 +383,6 @@ public class DlgNuevoPropietario extends javax.swing.JFrame {
     private javax.swing.JTextField txtCorreo;
     private javax.swing.JTextField txtDireccion;
     private javax.swing.JTextField txtNombre;
-    private javax.swing.JTextField txtTelefono;
+    private javax.swing.JFormattedTextField txtTelefono;
     // End of variables declaration//GEN-END:variables
 }
